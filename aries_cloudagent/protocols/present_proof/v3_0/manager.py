@@ -124,7 +124,6 @@ class V30PresManager:
 
         """
         proof_proposal = pres_ex_record.pres_proposal
-        # input_formats = proof_proposal.formats
         input_attachments = proof_proposal.attachments
         input_formats = []
         for attach in input_attachments:
@@ -263,7 +262,6 @@ class V30PresManager:
 
         """
         proof_request = pres_ex_record.pres_request
-        # input_formats = proof_request.formats
         input_attachments = proof_request.attachments
         input_formats = []
         for attach in input_attachments:
@@ -295,6 +293,10 @@ class V30PresManager:
             attachments=[attach for (_, attach) in pres_formats],
         )
 
+        #TODO: check if this should be the new way of handling this
+        # Assign thid (and optionally pthid) to message
+        # pres_message.assign_thread_from(pres_ex_record.pres_request)
+
         pres_message._thread = {"thid": pres_ex_record.thread_id}
         pres_message.assign_trace_decorator(
             self._profile.settings, pres_ex_record.trace
@@ -311,6 +313,7 @@ class V30PresManager:
             await pres_ex_record.save(session, reason="create v3.0 presentation")
         return pres_ex_record, pres_message
 
+    #TODO: add oob_record and add optional parameter to both connection types
     async def receive_pres(self, message: V30Pres, conn_record: ConnRecord):
         """
         Receive a presentation, from message in context on manager creation.
@@ -321,11 +324,28 @@ class V30PresManager:
         """
 
         thread_id = message._thread_id
+
+        #TODO: check this and add this 
+        ## Normally we only set the connection_id to None if an oob record is present
+        ## But present proof supports the old-style AIP-1 connectionless exchange that
+        ## bypasses the oob record. So we can't verify if an oob record is associated with
+        ## the exchange because it is possible that there is None
+        #connection_id = (
+        #    None
+        #    if oob_record
+        #    else connection_record.connection_id
+        #    if connection_record
+        #    else None
+        #)
+
+
         conn_id_filter = (
             None
             if conn_record is None
             else {"connection_id": conn_record.connection_id}
         )
+
+        #TODO: check this and work on this 
         async with self._profile.session() as session:
             try:
                 pres_ex_record = await V30PresExRecord.retrieve_by_tag_filter(
@@ -381,7 +401,6 @@ class V30PresManager:
 
         """
         pres_request_msg = pres_ex_record.pres_request
-        # input_formats = pres_request_msg.formats
         input_attachments = pres_request_msg.attachments
         input_formats = []
         for attach in input_attachments:

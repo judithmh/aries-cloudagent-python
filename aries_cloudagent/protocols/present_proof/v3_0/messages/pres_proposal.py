@@ -35,8 +35,7 @@ class V30PresProposal(AgentMessage):
         _id: str = None,
         *,
         # comment: str = None,
-        body: V30PresBody = V30PresBody(),  # is an REQUIRED filed vor didcomV2
-        # formats: Sequence[V30PresFormat] = None,
+        body: V30PresBody = V30PresBody(),
         attachments: Sequence[AttachDecorator] = None,
         **kwargs,
     ):
@@ -77,14 +76,14 @@ class V30PresProposalSchema(AgentMessageSchemaV2):
         model_class = V30PresProposal
         unknown = EXCLUDE
 
-    # comment = fields.Str(description="Human-readable comment", required=False)
     body = fields.Nested(
         # presentation-proposal-msg has no field will_confirm
         V30PresBodySchema(only=("comment", "goal_code")),
         comment="Human-readable comment",
         description="Body descriptor with GoalCode made for PresProof",
-        data_key="body",  # def name of field just to make sure
-        example="hier könnt ihr body-example stehen",
+        data_key="body", 
+        #TODO: add example
+        example="",
         required=True,
         allow_none=False,
     )
@@ -92,7 +91,6 @@ class V30PresProposalSchema(AgentMessageSchemaV2):
     attachments = fields.Nested(
         AttachDecoratorSchema,
         many=True,
-        # required=True,
         required=False,
         data_key="attachments",
         description="Attachment per acceptable format on corresponding identifier",
@@ -101,15 +99,12 @@ class V30PresProposalSchema(AgentMessageSchemaV2):
     @validates_schema
     def validate_fields(self, data, **kwargs):
         """Validate presentation attachment per format."""
-
-        print(f"data {data}")
         attachments = data.get("attachments") or []
-        print(f"attach{attachments}")
+
+        #TODO: check if comparison is actually necessary
         formats = []
         for atch in attachments:
             formats.append(atch.format)
-        print(f"formats {formats}")
-
         if len(formats) != len(attachments):
             raise ValidationError("Formats/attachments length mismatch")
 

@@ -101,8 +101,6 @@ class V30PresExRecord(BaseExchangeRecord):
             msg = getattr(self, item)
 
             if msg:
-                print("this is the whole message")
-                print(msg)
                 try:
                     result.update(
                         {

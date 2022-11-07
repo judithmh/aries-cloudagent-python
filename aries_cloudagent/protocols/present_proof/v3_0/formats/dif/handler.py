@@ -123,6 +123,8 @@ class DIFPresFormatHandler(V30PresFormatHandler):
         self, message_type: str, data: dict
     ) -> Tuple[V30PresFormat, AttachDecorator]:
         """Get presentation format and attach objects for use in pres_ex messages."""
+        
+        #TODO: Check if returning 1 format would be ok 
         format = V30PresFormat(
             # attach_id=DIFPresFormatHandler.format.api,
             format_=self.get_format_identifier(message_type),
@@ -155,9 +157,6 @@ class DIFPresFormatHandler(V30PresFormatHandler):
 
         """
         dif_proof_request = {}
-        # pres_proposal_dict = pres_ex_record.pres_proposal.attachment(
-        #     DIFPresFormatHandler.format
-        # )
         pres_proposal_dict_atch = pres_ex_record.pres_proposal.attachments
         for att in pres_proposal_dict_atch:
             if (
@@ -437,17 +436,14 @@ class DIFPresFormatHandler(V30PresFormatHandler):
     async def receive_pres(self, message: V30Pres, pres_ex_record: V30PresExRecord):
         """Receive a presentation, from message in context on manager creation."""
         dif_handler = DIFPresExchHandler(self._profile)
-        # dif_proof = message.attachment(DIFPresFormatHandler.format)
         dif_proof_atch = message.attachments
+        #TODO check if dif_proof it actually contains vals 
         for att in dif_proof_atch:
             if (
                 V30PresFormat.Format.get(att.format.format).api
                 == V30PresFormat.Format.DIF.api
             ):
                 dif_proof = att.content
-        # proof_request = pres_ex_record.pres_request.attachment(
-        #     DIFPresFormatHandler.format
-        # )
         proof_request_atch = pres_ex_record.pres_request.attachments
         for att in proof_request_atch:
             if (
@@ -492,10 +488,8 @@ class DIFPresFormatHandler(V30PresFormatHandler):
         """
         async with self._profile.session() as session:
             wallet = session.inject(BaseWallet)
-            # dif_proof = pres_ex_record.pres.attachment(DIFPresFormatHandler.format)
-            # pres_request = pres_ex_record.pres_request.attachment(
-            #     DIFPresFormatHandler.format
-            # )
+            
+            #TODO: check check if dif_proof contains vals afterwards
             dif_proof_atch = pres_ex_record.pres.attachments
             for att in dif_proof_atch:
                 if (

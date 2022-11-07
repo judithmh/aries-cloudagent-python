@@ -484,8 +484,6 @@ async def present_proof_credentials_list(request: web.BaseRequest):
     indy_credentials = []
     # INDY
     try:
-        print(" indyyyyy pressss in routes")
-        print(pres_ex_record.by_format["pres_request"])
         indy_pres_request = pres_ex_record.by_format["pres_request"].get(
             V30PresFormat.Format.INDY.api
         )
@@ -1096,6 +1094,28 @@ async def present_proof_send_presentation(request: web.BaseRequest):
                 f"(must be {V30PresExRecord.STATE_REQUEST_RECEIVED})"
             )
         )
+
+
+    ## Fetch connection if exchange has record
+    ## TODO: add connection oob part 
+    #conn_record = None
+    #if pres_ex_record.connection_id:
+    #    try:
+    #        async with profile.session() as session:
+#
+    #            conn_record = await ConnRecord.retrieve_by_id(
+    #                session, pres_ex_record.connection_id
+    #            )
+    #    except StorageNotFoundError as err:
+    #        raise web.HTTPBadRequest(reason=err.roll_up) from err
+#
+    #if conn_record and not conn_record.is_ready:
+    #    raise web.HTTPForbidden(
+    #        reason=f"Connection {pres_ex_record.connection_id} not ready"
+    #    )
+
+
+
 
     connection_id = pres_ex_record.connection_id
     try:

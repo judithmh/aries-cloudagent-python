@@ -29,6 +29,9 @@ class V30PresAck(V10Ack):
         """
         super().__init__(status, **kwargs)
 
+        #TODO: check and add if necessary
+        #self._verification_result = verification_result
+
 
 class V30PresAckSchema(V10AckSchema):
     """Schema for V30PresAck class."""
@@ -38,3 +41,11 @@ class V30PresAckSchema(V10AckSchema):
 
         model_class = V30PresAck
         unknown = EXCLUDE
+    
+    #TODO: check and add verification result if necessary
+    #verification_result = fields.Str(
+    #    required=False,
+    #    description="Whether presentation is verified: true or false",
+    #    example="true",
+    #    validate=validate.OneOf(["true", "false"]),
+    #)

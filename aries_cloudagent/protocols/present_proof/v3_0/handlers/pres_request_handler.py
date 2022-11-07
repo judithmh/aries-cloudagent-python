@@ -39,6 +39,29 @@ class V30PresRequestHandler(BaseHandler):
             context.message.serialize(as_string=True),
         )
 
+        #TODO: check and add this
+        ## If connection is present it must be ready for use
+        #if context.connection_record and not context.connection_ready:
+        #    raise HandlerException("Connection used for presentation request not ready")
+#
+        ## Find associated oob record
+        #oob_processor = context.inject(OobMessageProcessor)
+        #oob_record = await oob_processor.find_oob_record_for_inbound_message(context)
+#
+        ## Either connection or oob context must be present
+        #if not context.connection_record and not oob_record:
+        #    raise HandlerException(
+        #        "No connection or associated connectionless exchange found for"
+        #        " presentation request"
+        #    )
+#       
+        #TODO:  check and mybe delete this
+        #connection_id = (
+        #    context.connection_record.connection_id
+        #    if context.connection_record
+        #    else None
+        #)
+
         if not context.connection_ready:
             raise HandlerException("No connection established for presentation request")
 
@@ -47,12 +70,15 @@ class V30PresRequestHandler(BaseHandler):
 
         # Get pres ex record (holder initiated via proposal)
         # or create it (verifier sent request first)
+        #TODO: check and add role if necessary!
         try:
             async with profile.session() as session:
                 pres_ex_record = await V30PresExRecord.retrieve_by_tag_filter(
                     session,
                     {"thread_id": context.message._thread_id},
-                    {"connection_id": context.connection_record.connection_id},
+                    {"connection_id": context.connection_record.connection_id
+                    #,"role": V20PresExRecord.ROLE_PROVER,
+                    },
                 )  # holder initiated via proposal
             pres_ex_record.pres_request = context.message
         except StorageNotFoundError:

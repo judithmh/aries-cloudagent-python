@@ -35,8 +35,7 @@ class V30Pres(AgentMessage):
         self,
         _id: str = None,
         *,
-        body: V30PresBody = None,  # not a sequence!!
-        # formats: Sequence[V30PresFormat] = None,
+        body: V30PresBody = None,
         attachments: Sequence[AttachDecorator] = None,
         **kwargs,
     ):

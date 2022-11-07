@@ -56,8 +56,7 @@ class V30PresProposalHandler(BaseHandler):
         # If auto_respond_presentation_proposal is set, reply with proof req
         if context.settings.get("debug.auto_respond_presentation_proposal"):
             pres_request_message = None
-            print("##### prop handler")
-            print(context.message)
+            comment = ""
             if context.message.body:
                 comment = context.message.body.comment
             else:
@@ -68,7 +67,7 @@ class V30PresProposalHandler(BaseHandler):
                     pres_request_message,
                 ) = await pres_manager.create_bound_request(
                     pres_ex_record=pres_ex_record,
-                    comment=comment,  # context.message.body.comment,
+                    comment=comment,  
                 )
                 await responder.send_reply(pres_request_message)
             except (BaseModelError, LedgerError, StorageError) as err:

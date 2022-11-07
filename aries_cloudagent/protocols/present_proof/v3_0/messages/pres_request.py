@@ -77,7 +77,7 @@ class V30PresRequestSchema(AgentMessageSchemaV2):
         V30PresBodySchema,  # including will_confirm
         comment="Human-readable comment",
         description="Body descriptor with GoalCode made for PresProof",
-        data_key="body",  # def name of field just to make sure
+        data_key="body", 
         example="hier könnt ihr body-example stehen",
         required=True,
         allow_none=False,
@@ -86,7 +86,6 @@ class V30PresRequestSchema(AgentMessageSchemaV2):
     attachments = fields.Nested(
         AttachDecoratorSchema,
         many=True,
-        # required=True,
         required=False,
         description="Attachment per acceptable format on corresponding identifier",
         data_key="attachments",
@@ -95,19 +94,16 @@ class V30PresRequestSchema(AgentMessageSchemaV2):
     @validates_schema
     def validate_fields(self, data, **kwargs):
         """Validate presentation attachment per format."""
-        print(f"data {data}")
         attachments = data.get("attachments") or []
-        print(f"attach{attachments}")
         formats = []
         for atch in attachments:
             formats.append(atch.format)
-        print(f"formats {formats}")
-
+        
+        #TODO: check if comparison necessary
         if len(formats) != len(attachments):
             raise ValidationError("Formats/attachments length mismatch")
 
         for atch in attachments:
-            # atch = get_attach_by_id(fmt.attach_id)
             pres_format = V30PresFormat.Format.get(atch.format.format)
             if pres_format:
                 pres_format.validate_fields(PRES_30_REQUEST, atch.content)

@@ -8,6 +8,7 @@ from .....utils.tracing import trace_event, get_timer
 from ..manager import V30PresManager
 from ..messages.pres_ack import V30PresAck
 
+#TODO: add OobMessageProcessor!
 
 class V30PresAckHandler(BaseHandler):
     """Message handler class for presentation acks."""
@@ -25,10 +26,27 @@ class V30PresAckHandler(BaseHandler):
         self._logger.debug("V30PresAckHandler called with context %s", context)
         assert isinstance(context.message, V30PresAck)
         self._logger.info(
-            "Received v2.0 presentation ack message: %s",
+            "Received v3.0 presentation ack message: %s",
             context.message.serialize(as_string=True),
         )
 
+        #TODO: Check add this 
+        ## If connection is present it must be ready for use
+        #if context.connection_record and not context.connection_ready:
+        #    raise HandlerException("Connection used for presentation ack not ready")
+#
+        ## Find associated oob record
+        #oob_processor = context.inject(OobMessageProcessor)
+        #oob_record = await oob_processor.find_oob_record_for_inbound_message(context)
+#
+        ## Either connection or oob context must be present
+        #if not context.connection_record and not oob_record:
+        #    raise HandlerException(
+        #        "No connection or associated connectionless exchange found for"
+        #        " presentation ack"
+        #    )
+
+        #TODO: maybe deleete this
         if not context.connection_ready:
             raise HandlerException("No connection established for presentation ack")
 

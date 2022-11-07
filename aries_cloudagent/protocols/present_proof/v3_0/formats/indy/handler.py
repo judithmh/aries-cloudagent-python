@@ -88,11 +88,9 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
         format = V30PresFormat(
             format_=self.get_format_identifier(message_type),
         )
+
+        #TODO: Check if format twice neccessay
         return (
-            # V30PresFormat(
-            #     attach_id=IndyPresExchangeHandler.format.api,
-            #     format_=self.get_format_identifier(message_type),
-            # ),
             format,
             AttachDecorator.data_base64(
                 data, ident=IndyPresExchangeHandler.format.api, format=format
@@ -135,27 +133,6 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
             indy_proof_request["nonce"] = await generate_pr_nonce()
         return self.get_format_data(PRES_30_REQUEST, indy_proof_request)
 
-    # def attch_test(fmt: V30PresFormat.Format) -> dict:
-
-    #     target_format = (
-    #         fmt
-    #         if fmt
-    #         else next(
-    #             filter(
-    #                 lambda ff: ff,
-    #                 [V30PresFormat.Format.get(f.format) for f in self.formats],
-    #             ),
-    #             None,
-    #         )
-    #     )
-    #     return (
-    #         target_format.get_attachment_data(
-    #             self.formats,
-    #             self.request_presentations_attach,
-    #         )
-    #         if target_format
-    #         else None
-    #     )
 
     async def create_pres(
         self,
@@ -170,11 +147,7 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
                 indy_proof_request = proof_request.attachment(
                     IndyPresExchangeHandler.format
                 )
-                # tmp:
-                # indy_proof_request = proof_request.attachments
 
-                print("##### in format indy handler")
-                print(indy_proof_request)
                 requested_credentials = (
                     await indy_proof_req_preview2indy_requested_creds(
                         indy_proof_request,
@@ -208,7 +181,7 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
         def _check_proof_vs_proposal():
             """Check for bait and switch in presented values vs. proposal request."""
             proof_req = pres_ex_record.pres_request.attachments
-
+            
             for att in proof_req:
                 if (
                     V30PresFormat.Format.get(att.format.format).api
@@ -333,10 +306,8 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
                         f"Presented predicate {reft} does not satisfy proof request "
                         f"restrictions {req_restrictions}"
                     )
-
         proof = message.attachments
         for att in proof:
-            print("Indy handler")
             if (
                 V30PresFormat.Format.get(att.format.format).api
                 == V30PresFormat.Format.INDY.api
@@ -359,7 +330,6 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
         pres_request_msg = pres_ex_record.pres_request
         indy_proof_request = pres_request_msg.attachments
         for att in indy_proof_request:
-            print("Verify pres request")
             if (
                 V30PresFormat.Format.get(att.format.format).api
                 == V30PresFormat.Format.INDY.api
@@ -367,7 +337,6 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
                 indy_proof_request = att.content
         indy_proof = pres_ex_record.pres.attachments
         for att in indy_proof:
-            print("Verify pres")
             if (
                 V30PresFormat.Format.get(att.format.format).api
                 == V30PresFormat.Format.INDY.api
@@ -382,6 +351,7 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
         ) = await indy_handler.process_pres_identifiers(indy_proof["identifiers"])
 
         verifier = self._profile.inject(IndyVerifier)
+        #TODO: check IMPORTANT
         pres_ex_record.verified = json.dumps(  # tag: needs string value
             await verifier.verify_presentation(
                 indy_proof_request,

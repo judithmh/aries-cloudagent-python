@@ -75,12 +75,10 @@ class V30PresFormat(BaseModel):
     def __init__(
         self,
         *,
-        #    attach_id: str = None,
         format_: str = None,
         **kwargs
     ):
         """Initialize present-proof protocol message attachment format."""
-        #  self.attach_id = attach_id or uuid4()
         self.format_ = format_
 
     @property
