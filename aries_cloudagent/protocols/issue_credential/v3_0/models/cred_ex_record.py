@@ -85,7 +85,6 @@ class V30CredExRecord(BaseExchangeRecord):
         self.initiator = initiator
         self.role = role
         self.state = state
-        print(f"CRED PROPOSAL IN cred_ex_record {cred_proposal}")
         self._cred_proposal = V30CredProposal.serde(cred_proposal)
         self._cred_offer = V30CredOffer.serde(cred_offer)
         self._cred_request = V30CredRequest.serde(cred_request)

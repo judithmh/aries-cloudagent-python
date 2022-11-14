@@ -810,7 +810,7 @@ async def _create_free_offer(
         profile.settings,
         trace_msg,
     )
-    print(f"cred proposal OBJECT {cred_proposal}")
+
     tmp = cred_proposal.serialize()
     tmp["body"] = cred_proposal._body.serialize()
 
