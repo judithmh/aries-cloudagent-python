@@ -146,7 +146,7 @@ class IndyCredFormatHandler(V30CredFormatHandler):
         """
         format = V30CredFormat(
             # attach_id=IndyCredFormatHandler.format.api,
-            format_=self.get_format_identifier(message_type),
+                format_=self.get_format_identifier(message_type),
         )
         return (
             format,
@@ -194,6 +194,7 @@ class IndyCredFormatHandler(V30CredFormatHandler):
         issuer = self.profile.inject(IndyIssuer)
         ledger = self.profile.inject(BaseLedger)
         cache = self.profile.inject_or(BaseCache)
+        cred_def_id = None
         for attach in cred_proposal_message.attachments:
             cred_def_id = await self._match_sent_cred_def_id(attach.content)
 

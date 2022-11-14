@@ -2,7 +2,7 @@
 
 import logging
 
-from typing import Any, Mapping, Union
+from typing import Any, Mapping, Optional, Union
 
 from marshmallow import fields, Schema, validate
 
@@ -10,6 +10,7 @@ from .....core.profile import ProfileSession
 from .....messaging.models.base_record import BaseExchangeRecord, BaseExchangeSchema
 from .....messaging.valid import UUIDFour
 from .....storage.base import StorageError
+
 from ..messages.cred_format import V30CredFormat
 from ..messages.cred_issue import V30CredIssue, V30CredIssueSchema
 from ..messages.cred_proposal import V30CredProposal, V30CredProposalSchema
@@ -215,7 +216,11 @@ class V30CredExRecord(BaseExchangeRecord):
 
     @classmethod
     async def retrieve_by_conn_and_thread(
-        cls, session: ProfileSession, connection_id: str, thread_id: str
+        cls,
+        session: ProfileSession,
+        connection_id: Optional[str],
+        thread_id: str,
+        role: Optional[str] = None,
     ) -> "V30CredExRecord":
         """Retrieve a credential exchange record by connection and thread ID."""
         cache_key = f"credential_exchange_ctidx::{connection_id}::{thread_id}"
@@ -223,10 +228,15 @@ class V30CredExRecord(BaseExchangeRecord):
         if record_id:
             record = await cls.retrieve_by_id(session, record_id)
         else:
+            post_filter = {}
+            if role:
+                post_filter["role"] = role
+            if connection_id:
+                post_filter["connection_id"] = connection_id
             record = await cls.retrieve_by_tag_filter(
                 session,
                 {"thread_id": thread_id},
-                {"connection_id": connection_id} if connection_id else None,
+                post_filter,
             )
             await cls.set_cached_key(session, cache_key, record.cred_ex_id)
         return record

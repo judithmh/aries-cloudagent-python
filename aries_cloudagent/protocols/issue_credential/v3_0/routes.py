@@ -15,6 +15,8 @@ from aiohttp_apispec import (
 )
 from marshmallow import fields, validate, validates_schema, ValidationError
 
+from ...out_of_band.v1_0.models.oob_record import OobRecord
+from ....wallet.util import default_did_from_verkey
 from ....admin.request_context import AdminRequestContext
 from ....connections.models.conn_record import ConnRecord
 from ....core.profile import Profile
@@ -387,7 +389,7 @@ def _formats_filters(filt_spec: Mapping) -> Mapping:
                 AttachDecorator.data_base64(
                     mapping=filt_by_fmt, ident=fmt_api, format=format
                 )
-            )
+    )
 
     return attach
 
@@ -425,7 +427,7 @@ def _format_result_with_details(
     summary="Fetch all credential exchange records",
 )
 @querystring_schema(V30CredExRecordListQueryStringSchema)
-@response_schema(V30CredExRecordListResultSchema(), 3.0, description="")
+@response_schema(V30CredExRecordListResultSchema(), 200, description="")
 async def credential_exchange_list(request: web.BaseRequest):
     """
     Request handler for searching credential exchange records.
@@ -473,7 +475,7 @@ async def credential_exchange_list(request: web.BaseRequest):
     summary="Fetch a single credential exchange record",
 )
 @match_info_schema(V30CredExIdMatchInfoSchema())
-@response_schema(V30CredExRecordDetailSchema(), 3.0, description="")
+@response_schema(V30CredExRecordDetailSchema(), 200, description="")
 async def credential_exchange_retrieve(request: web.BaseRequest):
     """
     Request handler for fetching single credential exchange record.
@@ -518,7 +520,7 @@ async def credential_exchange_retrieve(request: web.BaseRequest):
     summary="Create credential from attribute values",
 )
 @request_schema(V30IssueCredSchemaCore())
-@response_schema(V30CredExRecordSchema(), 3.0, description="")
+@response_schema(V30CredExRecordSchema(), 200, description="")
 async def credential_exchange_create(request: web.BaseRequest):
     """
     Request handler for creating a credential from attr values.
@@ -539,13 +541,10 @@ async def credential_exchange_create(request: web.BaseRequest):
     context: AdminRequestContext = request["context"]
 
     body = await request.json()
-    print("la bodyyyy")
-    print(body)
+
     comment = body.get("comment")
     preview_spec = body.get("credential_preview")
     filt_spec = body.get("filters")
-    print("filteeeeeeeeeeeeeeeer")
-    print(filt_spec)
     auto_remove = body.get("auto_remove")
     if not filt_spec:
         raise web.HTTPBadRequest(reason="Missing filter")
@@ -595,7 +594,7 @@ async def credential_exchange_create(request: web.BaseRequest):
     summary="Send holder a credential, automating entire flow",
 )
 @request_schema(V30CredExFreeSchema())
-@response_schema(V30CredExRecordSchema(), 3.0, description="")
+@response_schema(V30CredExRecordSchema(), 200, description="")
 async def credential_exchange_send(request: web.BaseRequest):
     """
     Request handler for sending credential from issuer to holder from attr values.
@@ -618,8 +617,7 @@ async def credential_exchange_send(request: web.BaseRequest):
     outbound_handler = request["outbound_message_router"]
 
     body = await request.json()
-    print("this is a body")
-    print(body)
+
     comment = body.get("comment")
     connection_id = body.get("connection_id")
     filt_spec = body.get("filter")
@@ -705,7 +703,7 @@ async def credential_exchange_send(request: web.BaseRequest):
     summary="Send issuer a credential proposal",
 )
 @request_schema(V30CredExFreeSchema())
-@response_schema(V30CredExRecordSchema(), 3.0, description="")
+@response_schema(V30CredExRecordSchema(), 200, description="")
 async def credential_exchange_send_proposal(request: web.BaseRequest):
     """
     Request handler for sending credential proposal.
@@ -797,10 +795,8 @@ async def _create_free_offer(
     trace_msg: bool = None,
 ):
     """Create a credential offer and related exchange record."""
-    print("create_free_ffer")
-    print(preview_spec)
+
     cred_preview = V30CredPreview.deserialize(preview_spec) if preview_spec else None
-    print(cred_preview)
     cred_proposal = V30CredProposal(
         _body=V30CredBody(comment=comment, credential_preview=cred_preview),
         attachments=_formats_filters(filt_spec),
@@ -824,8 +820,6 @@ async def _create_free_offer(
         trace=trace_msg,
     )
 
-    print(f"cred_ex_record {cred_ex_record}")
-
     cred_manager = V30CredManager(profile)
     (cred_ex_record, cred_offer_message) = await cred_manager.create_offer(
         cred_ex_record,
@@ -841,7 +835,7 @@ async def _create_free_offer(
     summary="Create a credential offer, independent of any proposal or connection",
 )
 @request_schema(V30CredOfferConnFreeRequestSchema())
-@response_schema(V30CredExRecordSchema(), 3.0, description="")
+@response_schema(V30CredExRecordSchema(), 200, description="")
 async def credential_exchange_create_free_offer(request: web.BaseRequest):
     """
     Request handler for creating free credential offer.
@@ -910,7 +904,7 @@ async def credential_exchange_create_free_offer(request: web.BaseRequest):
     summary="Send holder a credential offer, independent of any proposal",
 )
 @request_schema(V30CredOfferRequestSchema())
-@response_schema(V30CredExRecordSchema(), 3.0, description="")
+@response_schema(V30CredExRecordSchema(), 200, description="")
 async def credential_exchange_send_free_offer(request: web.BaseRequest):
     """
     Request handler for sending free credential offer.
@@ -932,8 +926,7 @@ async def credential_exchange_send_free_offer(request: web.BaseRequest):
     outbound_handler = request["outbound_message_router"]
 
     body = await request.json()
-    print("body in send oofer")
-    print(body)
+
     connection_id = body.get("connection_id")
     filt_spec = body.get("filter")
     if not filt_spec:
@@ -1004,7 +997,7 @@ async def credential_exchange_send_free_offer(request: web.BaseRequest):
 )
 @match_info_schema(V30CredExIdMatchInfoSchema())
 @request_schema(V30CredBoundOfferRequestSchema())
-@response_schema(V30CredExRecordSchema(), 3.0, description="")
+@response_schema(V30CredExRecordSchema(), 200, description="")
 async def credential_exchange_send_bound_offer(request: web.BaseRequest):
     """
     Request handler for sending bound credential offer.
@@ -1061,8 +1054,8 @@ async def credential_exchange_send_bound_offer(request: web.BaseRequest):
             cred_ex_record,
             counter_proposal=V30CredProposal(
                 _body=V30CredBody(
-                    comment=None,
-                    credential_preview=V30CredPreview.deserialize(preview_spec),
+                comment=None,
+                credential_preview=V30CredPreview.deserialize(preview_spec),
                 ),
                 attachments=_formats_filters(filt_spec),
             )
@@ -1115,7 +1108,7 @@ async def credential_exchange_send_bound_offer(request: web.BaseRequest):
     ),
 )
 @request_schema(V30CredRequestFreeSchema())
-@response_schema(V30CredExRecordSchema(), 3.0, description="")
+@response_schema(V30CredExRecordSchema(), 200, description="")
 async def credential_exchange_send_free_request(request: web.BaseRequest):
     """
     Request handler for sending free credential request.
@@ -1219,7 +1212,7 @@ async def credential_exchange_send_free_request(request: web.BaseRequest):
 )
 @match_info_schema(V30CredExIdMatchInfoSchema())
 @request_schema(V30CredRequestRequestSchema())
-@response_schema(V30CredExRecordSchema(), 3.0, description="")
+@response_schema(V30CredExRecordSchema(), 200, description="")
 async def credential_exchange_send_bound_request(request: web.BaseRequest):
     """
     Request handler for sending credential request.
@@ -1257,16 +1250,36 @@ async def credential_exchange_send_bound_request(request: web.BaseRequest):
             except StorageNotFoundError as err:
                 raise web.HTTPNotFound(reason=err.roll_up) from err
 
-            connection_id = cred_ex_record.connection_id
-            conn_record = await ConnRecord.retrieve_by_id(session, connection_id)
+            conn_record = None
+            if cred_ex_record.connection_id:
+                try:
+                    conn_record = await ConnRecord.retrieve_by_id(
+                        session, cred_ex_record.connection_id
+                    )
+                except StorageNotFoundError as err:
+                    raise web.HTTPBadRequest(reason=err.roll_up) from err
 
-        if not conn_record.is_ready:
-            raise web.HTTPForbidden(reason=f"Connection {connection_id} not ready")
+        if conn_record and not conn_record.is_ready:
+            raise web.HTTPForbidden(
+                reason=f"Connection {cred_ex_record.connection_id} not ready"
+            )
+
+        if conn_record or holder_did:
+            holder_did = holder_did or conn_record.my_did
+        else:
+            # Need to get the holder DID from the out of band record
+            async with profile.session() as session:
+                oob_record = await OobRecord.retrieve_by_tag_filter(
+                    session,
+                    {"invi_msg_id": cred_ex_record.cred_offer._thread.pthid},
+                )
+                # Transform recipient key into did
+                holder_did = default_did_from_verkey(oob_record.our_recipient_key)
 
         cred_manager = V30CredManager(profile)
         cred_ex_record, cred_request_message = await cred_manager.create_request(
             cred_ex_record,
-            holder_did if holder_did else conn_record.my_did,
+            holder_did,
         )
 
         result = cred_ex_record.serialize()
@@ -1291,7 +1304,9 @@ async def credential_exchange_send_bound_request(request: web.BaseRequest):
             outbound_handler,
         )
 
-    await outbound_handler(cred_request_message, connection_id=connection_id)
+    await outbound_handler(
+        cred_request_message, connection_id=cred_ex_record.connection_id
+    )
 
     trace_event(
         context.settings,
@@ -1309,7 +1324,7 @@ async def credential_exchange_send_bound_request(request: web.BaseRequest):
 )
 @match_info_schema(V30CredExIdMatchInfoSchema())
 @request_schema(V30CredIssueRequestSchema())
-@response_schema(V30CredExRecordDetailSchema(), 3.0, description="")
+@response_schema(V30CredExRecordDetailSchema(), 200, description="")
 async def credential_exchange_issue(request: web.BaseRequest):
     """
     Request handler for sending credential.
@@ -1343,12 +1358,16 @@ async def credential_exchange_issue(request: web.BaseRequest):
                 )
             except StorageNotFoundError as err:
                 raise web.HTTPNotFound(reason=err.roll_up) from err
-            connection_id = cred_ex_record.connection_id
 
-            conn_record = await ConnRecord.retrieve_by_id(session, connection_id)
-
-        if not conn_record.is_ready:
-            raise web.HTTPForbidden(reason=f"Connection {connection_id} not ready")
+            conn_record = None
+            if cred_ex_record.connection_id:
+                conn_record = await ConnRecord.retrieve_by_id(
+                    session, cred_ex_record.connection_id
+                )
+        if conn_record and not conn_record.is_ready:
+            raise web.HTTPForbidden(
+                reason=f"Connection {cred_ex_record.connection_id} not ready"
+            )
 
         cred_manager = V30CredManager(profile)
         (cred_ex_record, cred_issue_message) = await cred_manager.issue_credential(
@@ -1379,7 +1398,9 @@ async def credential_exchange_issue(request: web.BaseRequest):
             outbound_handler,
         )
 
-    await outbound_handler(cred_issue_message, connection_id=connection_id)
+    await outbound_handler(
+        cred_issue_message, connection_id=cred_ex_record.connection_id
+    )
 
     trace_event(
         context.settings,
@@ -1397,7 +1418,7 @@ async def credential_exchange_issue(request: web.BaseRequest):
 )
 @match_info_schema(V30CredExIdMatchInfoSchema())
 @request_schema(V30CredStoreRequestSchema())
-@response_schema(V30CredExRecordDetailSchema(), 3.0, description="")
+@response_schema(V30CredExRecordDetailSchema(), 200, description="")
 async def credential_exchange_store(request: web.BaseRequest):
     """
     Request handler for storing credential.
@@ -1434,10 +1455,15 @@ async def credential_exchange_store(request: web.BaseRequest):
             except StorageNotFoundError as err:
                 raise web.HTTPNotFound(reason=err.roll_up) from err
 
-            connection_id = cred_ex_record.connection_id
-            conn_record = await ConnRecord.retrieve_by_id(session, connection_id)
-            if not conn_record.is_ready:
-                raise web.HTTPForbidden(reason=f"Connection {connection_id} not ready")
+            conn_record = None
+            if cred_ex_record.connection_id:
+                conn_record = await ConnRecord.retrieve_by_id(
+                    session, cred_ex_record.connection_id
+                )
+            if conn_record and not conn_record.is_ready:
+                raise web.HTTPForbidden(
+                    reason=f"Connection {cred_ex_record.connection_id} not ready"
+                )
 
         cred_manager = V30CredManager(profile)
         cred_ex_record = await cred_manager.store_credential(cred_ex_record, cred_id)
@@ -1495,7 +1521,7 @@ async def credential_exchange_store(request: web.BaseRequest):
     summary="Remove an existing credential exchange record",
 )
 @match_info_schema(V30CredExIdMatchInfoSchema())
-@response_schema(V30IssueCredentialModuleResponseSchema(), 3.0, description="")
+@response_schema(V30IssueCredentialModuleResponseSchema(), 200, description="")
 async def credential_exchange_remove(request: web.BaseRequest):
     """
     Request handler for removing a credential exchange record.
@@ -1524,7 +1550,7 @@ async def credential_exchange_remove(request: web.BaseRequest):
 )
 @match_info_schema(V30CredExIdMatchInfoSchema())
 @request_schema(V30CredIssueProblemReportRequestSchema())
-@response_schema(V30IssueCredentialModuleResponseSchema(), 3.0, description="")
+@response_schema(V30IssueCredentialModuleResponseSchema(), 200, description="")
 async def credential_exchange_problem_report(request: web.BaseRequest):
     """
     Request handler for sending problem report.

@@ -2,8 +2,10 @@
 
 import logging
 
-from typing import Mapping, Tuple
+from typing import Mapping, Optional, Tuple
 
+from ....connections.models.conn_record import ConnRecord
+from ....core.oob_processor import OobRecord
 from aries_cloudagent.protocols.issue_credential.v3_0.messages.cred_body import (
     V30CredBody,
 )
@@ -249,7 +251,7 @@ class V30CredManager:
         cred_offer_message = V30CredOffer(
             _body=V30CredBody(
                 comment=comment,
-                replacement_id=replacement_id,
+            replacement_id=replacement_id,
                 credential_preview=cred_proposal_message._body.credential_preview,
             ),
             attachments=[attach for (_, attach) in formats],
@@ -275,7 +277,7 @@ class V30CredManager:
     async def receive_offer(
         self,
         cred_offer_message: V30CredOffer,
-        connection_id: str,
+        connection_id: Optional[str],
     ) -> V30CredExRecord:
         """
         Receive a credential offer.
@@ -295,7 +297,10 @@ class V30CredManager:
             async with self._profile.session() as session:
                 cred_ex_record = await (
                     V30CredExRecord.retrieve_by_conn_and_thread(
-                        session, connection_id, cred_offer_message._thread_id
+                        session,
+                        connection_id,
+                        cred_offer_message._thread_id,
+                        role=V30CredExRecord.ROLE_HOLDER,
                     )
                 )
         except StorageNotFoundError:  # issuer sent this offer free of any proposal
@@ -397,7 +402,8 @@ class V30CredManager:
             # requests_attach=[attach for (_, attach) in request_formats],
         )
 
-        cred_request_message._thread = {"thid": cred_ex_record.thread_id}
+        # Assign thid (and optionally pthid) to message
+        cred_request_message.assign_thread_from(cred_ex_record.cred_offer)
         cred_request_message.assign_trace_decorator(
             self._profile.settings, cred_ex_record.trace
         )
@@ -412,7 +418,10 @@ class V30CredManager:
         return (cred_ex_record, cred_request_message)
 
     async def receive_request(
-        self, cred_request_message: V30CredRequest, connection_id: str
+        self,
+        cred_request_message: V30CredRequest,
+        connection_record: Optional[ConnRecord],
+        oob_record: Optional[OobRecord],
     ) -> V30CredExRecord:
         """
         Receive a credential request.
@@ -425,36 +434,38 @@ class V30CredManager:
             credential exchange record, updated
 
         """
+        # connection_id is None in the record if this is in response to
+        # an request~attach from an OOB message. If so, we do not want to filter
+        # the record by connection_id.
+        connection_id = None if oob_record else connection_record.connection_id
+
         async with self._profile.session() as session:
             try:
                 cred_ex_record = await (
                     V30CredExRecord.retrieve_by_conn_and_thread(
-                        session, connection_id, cred_request_message._thread_id
+                        session,
+                        connection_id,
+                        cred_request_message._thread_id,
+                        role=V30CredExRecord.ROLE_ISSUER,
                     )
                 )
             except StorageNotFoundError:
-                try:
-                    cred_ex_record = await V30CredExRecord.retrieve_by_tag_filter(
-                        session,
-                        {"thread_id": cred_request_message._thread_id},
-                        {"connection_id": None},
-                    )
-                    cred_ex_record.connection_id = connection_id
-                except StorageNotFoundError:
-                    # holder sent this request free of any offer
-                    cred_ex_record = V30CredExRecord(
-                        connection_id=connection_id,
-                        thread_id=cred_request_message._thread_id,
-                        initiator=V30CredExRecord.INITIATOR_EXTERNAL,
-                        role=V30CredExRecord.ROLE_ISSUER,
-                        auto_remove=not self._profile.settings.get(
-                            "preserve_exchange_records"
-                        ),
-                        trace=(cred_request_message._trace is not None),
-                        auto_issue=self._profile.settings.get(
-                            "debug.auto_respond_credential_request"
-                        ),
-                    )
+                # holder sent this request free of any offer
+                cred_ex_record = V30CredExRecord(
+                    connection_id=connection_id,
+                    thread_id=cred_request_message._thread_id,
+                    initiator=V30CredExRecord.INITIATOR_EXTERNAL,
+                    role=V30CredExRecord.ROLE_ISSUER,
+                    auto_remove=not self._profile.settings.get(
+                        "preserve_exchange_records"
+                    ),
+                    trace=(cred_request_message._trace is not None),
+                    auto_issue=self._profile.settings.get(
+                        "debug.auto_respond_credential_request"
+                    ),
+                )
+        if connection_record:
+            cred_ex_record.connection_id = connection_record.connection_id
         attachments = cred_request_message.attachments
         formats = []
         for atch in attachments:
@@ -555,7 +566,7 @@ class V30CredManager:
         return (cred_ex_record, cred_issue_message)
 
     async def receive_credential(
-        self, cred_issue_message: V30CredIssue, connection_id: str
+        self, cred_issue_message: V30CredIssue, connection_id: Optional[str]
     ) -> V30CredExRecord:
         """
         Receive a credential issue message from an issuer.
@@ -575,11 +586,11 @@ class V30CredManager:
                     session,
                     connection_id,
                     cred_issue_message._thread_id,
+                    role=V30CredExRecord.ROLE_HOLDER,
                 )
             )
 
         cred_request_message = cred_ex_record.cred_request
-
         req_formats = [
             V30CredFormat.Format.get(fmt.format.format)
             for fmt in cred_request_message.attachments
@@ -700,7 +711,7 @@ class V30CredManager:
         return cred_ex_record, cred_ack_message
 
     async def receive_credential_ack(
-        self, cred_ack_message: V30CredAck, connection_id: str
+        self, cred_ack_message: V30CredAck, connection_id: Optional[str]
     ) -> V30CredExRecord:
         """
         Receive credential ack from holder.
@@ -720,6 +731,7 @@ class V30CredManager:
                     session,
                     connection_id,
                     cred_ack_message._thread_id,
+                    role=V30CredExRecord.ROLE_ISSUER,
                 )
             )
 
