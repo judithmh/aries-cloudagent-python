@@ -1,6 +1,6 @@
 """Represents an explicit RFC 15 ack message, adopted into present-proof protocol."""
 
-from marshmallow import EXCLUDE
+from marshmallow import EXCLUDE, fields, validate
 
 from ....notification.v1_0.messages.ack import V10Ack, V10AckSchema
 
@@ -19,7 +19,7 @@ class V30PresAck(V10Ack):
         message_type = PRES_30_ACK
         schema_class = "V30PresAckSchema"
 
-    def __init__(self, status: str = None, **kwargs):
+    def __init__(self, status: str = None, verification_result: str = None, **kwargs):
         """
         Initialize an explicit ack message instance.
 
@@ -28,9 +28,7 @@ class V30PresAck(V10Ack):
 
         """
         super().__init__(status, **kwargs)
-
-        #TODO: check and add if necessary
-        #self._verification_result = verification_result
+        self._verification_result = verification_result
 
 
 class V30PresAckSchema(V10AckSchema):
@@ -42,10 +40,10 @@ class V30PresAckSchema(V10AckSchema):
         model_class = V30PresAck
         unknown = EXCLUDE
     
-    #TODO: check and add verification result if necessary
-    #verification_result = fields.Str(
-    #    required=False,
-    #    description="Whether presentation is verified: true or false",
-    #    example="true",
-    #    validate=validate.OneOf(["true", "false"]),
-    #)
+
+verification_result = fields.Str(
+    required=False,
+    description="Whether presentation is verified: true or false",
+    example="true",
+    validate=validate.OneOf(["true", "false"]),
+)

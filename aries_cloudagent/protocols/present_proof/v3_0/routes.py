@@ -346,7 +346,7 @@ def _formats_attach(by_format: Mapping, msg_type: str, spec: str) -> Mapping:
             attach.append(
                 AttachDecorator.data_json(
                     mapping=item_by_fmt, ident=fmt_api, format=format
-                )
+            )
             )
     return attach
 
@@ -1095,37 +1095,22 @@ async def present_proof_send_presentation(request: web.BaseRequest):
             )
         )
 
+    # Fetch connection if exchange has record
+    conn_record = None
+    if pres_ex_record.connection_id:
+        try:
+            async with profile.session() as session:
 
-    ## Fetch connection if exchange has record
-    ## TODO: add connection oob part 
-    #conn_record = None
-    #if pres_ex_record.connection_id:
-    #    try:
-    #        async with profile.session() as session:
-#
-    #            conn_record = await ConnRecord.retrieve_by_id(
-    #                session, pres_ex_record.connection_id
-    #            )
-    #    except StorageNotFoundError as err:
-    #        raise web.HTTPBadRequest(reason=err.roll_up) from err
-#
-    #if conn_record and not conn_record.is_ready:
-    #    raise web.HTTPForbidden(
-    #        reason=f"Connection {pres_ex_record.connection_id} not ready"
-    #    )
+                conn_record = await ConnRecord.retrieve_by_id(
+                    session, pres_ex_record.connection_id
+                )
+        except StorageNotFoundError as err:
+            raise web.HTTPBadRequest(reason=err.roll_up) from err
 
-
-
-
-    connection_id = pres_ex_record.connection_id
-    try:
-        async with profile.session() as session:
-            conn_record = await ConnRecord.retrieve_by_id(session, connection_id)
-    except StorageNotFoundError as err:
-        raise web.HTTPBadRequest(reason=err.roll_up) from err
-
-    if not conn_record.is_ready:
-        raise web.HTTPForbidden(reason=f"Connection {connection_id} not ready")
+    if conn_record and not conn_record.is_ready:
+        raise web.HTTPForbidden(
+            reason=f"Connection {pres_ex_record.connection_id} not ready"
+        )
 
     pres_manager = V30PresManager(profile)
     try:
@@ -1159,7 +1144,7 @@ async def present_proof_send_presentation(request: web.BaseRequest):
         context.settings,
         trace_msg,
     )
-    await outbound_handler(pres_message, connection_id=connection_id)
+    await outbound_handler(pres_message, connection_id=pres_ex_record.connection_id)
 
     trace_event(
         context.settings,

@@ -99,7 +99,7 @@ class V30PresRequestSchema(AgentMessageSchemaV2):
         for atch in attachments:
             formats.append(atch.format)
         
-        #TODO: check if comparison necessary
+
         if len(formats) != len(attachments):
             raise ValidationError("Formats/attachments length mismatch")
 

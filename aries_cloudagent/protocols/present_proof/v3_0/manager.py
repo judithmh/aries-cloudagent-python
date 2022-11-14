@@ -2,13 +2,13 @@
 
 import logging
 
-from typing import Tuple
+from typing import Optional, Tuple
 
+from ...out_of_band.v1_0.models.oob_record import OobRecord
 from ....connections.models.conn_record import ConnRecord
 from ....core.error import BaseError
 from ....core.profile import Profile
 from ....messaging.responder import BaseResponder
-from ....storage.error import StorageNotFoundError
 
 from .messages.pres import V30Pres
 from .messages.pres_ack import V30PresAck
@@ -269,7 +269,7 @@ class V30PresManager:
 
         pres_formats = []
         for format in input_formats:
-            # TODO: split the format!!!
+            # TODO: split the format
 
             pres_exch_format = V30PresFormat.Format.get(format.format)
 
@@ -293,11 +293,8 @@ class V30PresManager:
             attachments=[attach for (_, attach) in pres_formats],
         )
 
-        #TODO: check if this should be the new way of handling this
         # Assign thid (and optionally pthid) to message
-        # pres_message.assign_thread_from(pres_ex_record.pres_request)
-
-        pres_message._thread = {"thid": pres_ex_record.thread_id}
+        pres_message.assign_thread_from(pres_ex_record.pres_request)
         pres_message.assign_trace_decorator(
             self._profile.settings, pres_ex_record.trace
         )
@@ -313,8 +310,12 @@ class V30PresManager:
             await pres_ex_record.save(session, reason="create v3.0 presentation")
         return pres_ex_record, pres_message
 
-    #TODO: add oob_record and add optional parameter to both connection types
-    async def receive_pres(self, message: V30Pres, conn_record: ConnRecord):
+    async def receive_pres(
+        self,
+        message: V30Pres,
+        connection_record: Optional[ConnRecord],
+        oob_record: Optional[OobRecord],
+    ):
         """
         Receive a presentation, from message in context on manager creation.
 
@@ -324,38 +325,31 @@ class V30PresManager:
         """
 
         thread_id = message._thread_id
-
-        #TODO: check this and add this 
-        ## Normally we only set the connection_id to None if an oob record is present
-        ## But present proof supports the old-style AIP-1 connectionless exchange that
-        ## bypasses the oob record. So we can't verify if an oob record is associated with
-        ## the exchange because it is possible that there is None
-        #connection_id = (
-        #    None
-        #    if oob_record
-        #    else connection_record.connection_id
-        #    if connection_record
-        #    else None
-        #)
-
-
-        conn_id_filter = (
+        # Normally we only set the connection_id to None if an oob record is present
+        # But present proof supports the old-style AIP-1 connectionless exchange that
+        # bypasses the oob record. So we can't verify if an oob record is associated with
+        # the exchange because it is possible that there is None
+        connection_id = (
             None
-            if conn_record is None
-            else {"connection_id": conn_record.connection_id}
+            if oob_record
+            else connection_record.connection_id
+            if connection_record
+            else None
         )
 
-        #TODO: check this and work on this 
         async with self._profile.session() as session:
-            try:
-                pres_ex_record = await V30PresExRecord.retrieve_by_tag_filter(
-                    session, {"thread_id": thread_id}, conn_id_filter
-                )
-            except StorageNotFoundError:
-                # Proof req not bound to any connection: requests_attach in OOB msg
-                pres_ex_record = await V30PresExRecord.retrieve_by_tag_filter(
-                    session, {"thread_id": thread_id}, None
-                )
+            pres_ex_record = await V30PresExRecord.retrieve_by_tag_filter(
+                session,
+                {"thread_id": thread_id},
+                {
+                    "role": V30PresExRecord.ROLE_VERIFIER,
+                    "connection_id": connection_id,
+                },
+            )
+
+        # Save connection id (if it wasn't already present)
+        if connection_record:
+            pres_ex_record.connection_id = connection_record.connection_id
         input_formats = []
         input_attachments = message.attachments
 
@@ -379,14 +373,10 @@ class V30PresManager:
                     )
         pres_ex_record.pres = message
         pres_ex_record.state = V30PresExRecord.STATE_PRESENTATION_RECEIVED
-        if not pres_ex_record.connection_id:
-            pres_ex_record.connection_id = conn_record.connection_id
         async with self._profile.session() as session:
             await pres_ex_record.save(session, reason="receive v3.0 presentation")
 
         return pres_ex_record
-
-    # TODO: change the structure of verify_pres
 
     async def verify_pres(self, pres_ex_record: V30PresExRecord):
         """
@@ -437,7 +427,7 @@ class V30PresManager:
         responder = self._profile.inject_or(BaseResponder)
 
         if responder:
-            pres_ack_message = V30PresAck()
+            pres_ack_message = V30PresAck(verification_result=pres_ex_record.verified)
             pres_ack_message._thread = {"thid": pres_ex_record.thread_id}
             pres_ack_message.assign_trace_decorator(
                 self._profile.settings, pres_ex_record.trace
@@ -445,6 +435,7 @@ class V30PresManager:
 
             await responder.send_reply(
                 pres_ack_message,
+                # connection_id can be none in case of connectionless
                 connection_id=pres_ex_record.connection_id,
             )
         else:
@@ -461,13 +452,18 @@ class V30PresManager:
             presentation exchange record, retrieved and updated
 
         """
+        connection_id = conn_record.connection_id if conn_record else None
         async with self._profile.session() as session:
             pres_ex_record = await V30PresExRecord.retrieve_by_tag_filter(
                 session,
                 {"thread_id": message._thread_id},
-                {"connection_id": conn_record.connection_id},
+                {
+                    # connection_id can be null in connectionless
+                    "connection_id": connection_id,
+                    "role": V30PresExRecord.ROLE_PROVER,
+                },
             )
-
+            pres_ex_record.verified = message._verification_result
             pres_ex_record.state = V30PresExRecord.STATE_DONE
 
             await pres_ex_record.save(session, reason="receive v3.0 presentation ack")

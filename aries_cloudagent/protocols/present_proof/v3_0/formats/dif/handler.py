@@ -21,7 +21,7 @@ from ......vc.ld_proofs import (
 )
 from ......vc.vc_ld.verify import verify_presentation
 from ......wallet.base import BaseWallet
-from ......wallet.key_type import KeyType
+from ......wallet.key_type import ED25519, BLS12381G2
 
 from .....problem_report.v1_0.message import ProblemReport
 
@@ -56,14 +56,12 @@ class DIFPresFormatHandler(V30PresFormatHandler):
     format = V30PresFormat.Format.DIF
 
     ISSUE_SIGNATURE_SUITE_KEY_TYPE_MAPPING = {
-        Ed25519Signature2018: KeyType.ED25519,
+        Ed25519Signature2018: ED25519,
     }
 
     if BbsBlsSignature2020.BBS_SUPPORTED:
-        ISSUE_SIGNATURE_SUITE_KEY_TYPE_MAPPING[BbsBlsSignature2020] = KeyType.BLS12381G2
-        ISSUE_SIGNATURE_SUITE_KEY_TYPE_MAPPING[
-            BbsBlsSignatureProof2020
-        ] = KeyType.BLS12381G2
+        ISSUE_SIGNATURE_SUITE_KEY_TYPE_MAPPING[BbsBlsSignature2020] = BLS12381G2
+        ISSUE_SIGNATURE_SUITE_KEY_TYPE_MAPPING[BbsBlsSignatureProof2020] = BLS12381G2
 
     async def _get_all_suites(self, wallet: BaseWallet):
         """Get all supported suites for verifying presentation."""
@@ -123,11 +121,11 @@ class DIFPresFormatHandler(V30PresFormatHandler):
         self, message_type: str, data: dict
     ) -> Tuple[V30PresFormat, AttachDecorator]:
         """Get presentation format and attach objects for use in pres_ex messages."""
-        
+
         #TODO: Check if returning 1 format would be ok 
         format = V30PresFormat(
             # attach_id=DIFPresFormatHandler.format.api,
-            format_=self.get_format_identifier(message_type),
+                format_=self.get_format_identifier(message_type),
         )
         return (
             format,
@@ -437,6 +435,7 @@ class DIFPresFormatHandler(V30PresFormatHandler):
         """Receive a presentation, from message in context on manager creation."""
         dif_handler = DIFPresExchHandler(self._profile)
         dif_proof_atch = message.attachments
+        dif_proof = None
         #TODO check if dif_proof it actually contains vals 
         for att in dif_proof_atch:
             if (
@@ -491,6 +490,7 @@ class DIFPresFormatHandler(V30PresFormatHandler):
             
             #TODO: check check if dif_proof contains vals afterwards
             dif_proof_atch = pres_ex_record.pres.attachments
+            dif_proof = None
             for att in dif_proof_atch:
                 if (
                     V30PresFormat.Format.get(att.format.format).api

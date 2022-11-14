@@ -89,7 +89,6 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
             format_=self.get_format_identifier(message_type),
         )
 
-        #TODO: Check if format twice neccessay
         return (
             format,
             AttachDecorator.data_base64(
@@ -351,15 +350,14 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
         ) = await indy_handler.process_pres_identifiers(indy_proof["identifiers"])
 
         verifier = self._profile.inject(IndyVerifier)
-        #TODO: check IMPORTANT
         pres_ex_record.verified = json.dumps(  # tag: needs string value
             await verifier.verify_presentation(
-                indy_proof_request,
-                indy_proof,
-                schemas,
-                cred_defs,
-                rev_reg_defs,
-                rev_reg_entries,
-            )
+            indy_proof_request,
+            indy_proof,
+            schemas,
+            cred_defs,
+            rev_reg_defs,
+            rev_reg_entries,
+        )
         )
         return pres_ex_record

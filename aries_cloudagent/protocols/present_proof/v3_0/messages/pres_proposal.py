@@ -101,7 +101,6 @@ class V30PresProposalSchema(AgentMessageSchemaV2):
         """Validate presentation attachment per format."""
         attachments = data.get("attachments") or []
 
-        #TODO: check if comparison is actually necessary
         formats = []
         for atch in attachments:
             formats.append(atch.format)
