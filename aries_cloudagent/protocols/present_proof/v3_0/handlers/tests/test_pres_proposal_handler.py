@@ -17,6 +17,7 @@ from .. import pres_proposal_handler as test_module
 class TestV30PresProposalHandler(AsyncTestCase):
     async def test_called(self):
         request_context = RequestContext.test_context()
+        request_context.connection_record = async_mock.MagicMock()
         request_context.message_receipt = MessageReceipt()
         request_context.settings["debug.auto_respond_presentation_proposal"] = False
 
@@ -42,13 +43,8 @@ class TestV30PresProposalHandler(AsyncTestCase):
     async def test_called_auto_request(self):
         request_context = RequestContext.test_context()
         request_context.message = async_mock.MagicMock()
-        print(request_context.message)
-        print(request_context)
-        #request_context.message.body.comment = "hello world"
+        request_context.connection_record = async_mock.MagicMock()
         request_context.message = V30PresProposal( body = V30PresBody( comment = "hello world"))
-        print("#### test 2")
-        print(request_context.message)
-        print(request_context)
         request_context.message_receipt = MessageReceipt()
         request_context.settings["debug.auto_respond_presentation_proposal"] = True
 
@@ -70,9 +66,6 @@ class TestV30PresProposalHandler(AsyncTestCase):
             responder = MockResponder()
             await handler.handle(request_context, responder)
 
-        # if request_context.message.body:
-        #     comment = request_context.message.body.commet,
-        # else: comment = None
         mock_pres_mgr.assert_called_once_with(request_context.profile)
         mock_pres_mgr.return_value.create_bound_request.assert_called_once_with(
             pres_ex_record=(
@@ -88,9 +81,9 @@ class TestV30PresProposalHandler(AsyncTestCase):
 
     async def test_called_auto_request_x(self):
         request_context = RequestContext.test_context()
+        request_context.connection_record = async_mock.MagicMock()
         request_context.message = async_mock.MagicMock()
-        #request_context.message.body = { "comment" : "hello world",}
-        # request_context.message.body["comment"] = "hello world"
+        request_context.message.body.comment = "hello world"
         request_context.message_receipt = MessageReceipt()
         request_context.settings["debug.auto_respond_presentation_proposal"] = True
 
@@ -120,6 +113,7 @@ class TestV30PresProposalHandler(AsyncTestCase):
     async def test_called_not_ready(self):
         request_context = RequestContext.test_context()
         request_context.message_receipt = MessageReceipt()
+        request_context.connection_record = async_mock.MagicMock()
 
         with async_mock.patch.object(
             test_module, "V30PresManager", autospec=True
@@ -131,7 +125,27 @@ class TestV30PresProposalHandler(AsyncTestCase):
             request_context.connection_ready = False
             handler = test_module.V30PresProposalHandler()
             responder = MockResponder()
-            with self.assertRaises(test_module.HandlerException):
+            with self.assertRaises(test_module.HandlerException) as err:
                 await handler.handle(request_context, responder)
+            assert (
+                err.exception.message
+                == "Connection used for presentation proposal not ready"
+            )
+
+        assert not responder.messages
+
+    async def test_called_no_connection(self):
+        request_context = RequestContext.test_context()
+        request_context.message_receipt = MessageReceipt()
+
+        request_context.message = V30PresProposal()
+        handler = test_module.V30PresProposalHandler()
+        responder = MockResponder()
+        with self.assertRaises(test_module.HandlerException) as err:
+            await handler.handle(request_context, responder)
+        assert (
+            err.exception.message
+            == "Connectionless not supported for presentation proposal"
+        )
 
         assert not responder.messages
