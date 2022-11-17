@@ -10,7 +10,7 @@ from ......indy.models.pres_preview import (
     IndyPresPreview,
     IndyPresPredSpec,
 )
-from ......messaging.decorators.attach_decorator3 import AttachDecorator
+from ......messaging.decorators.attach_decorator_didcomm_v2_cred import AttachDecorator
 
 from ..cred_body import V30CredBody
 

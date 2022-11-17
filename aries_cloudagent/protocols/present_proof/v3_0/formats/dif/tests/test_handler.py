@@ -8,7 +8,7 @@ from aries_cloudagent.protocols.present_proof.dif.pres_exch import SchemaInputDe
 from aries_cloudagent.protocols.present_proof.v3_0.messages.pres_body import V30PresBody
 
 from .......core.in_memory import InMemoryProfile
-from .......messaging.decorators.attach_decorator2 import AttachDecorator
+from .......messaging.decorators.attach_decorator_didcomm_v2_pres import AttachDecorator
 from .......messaging.responder import MockResponder, BaseResponder
 from .......storage.vc_holder.base import VCHolder
 from .......storage.vc_holder.vc_record import VCRecord

@@ -23,7 +23,7 @@ from ......messaging.credential_definitions.util import (
     CRED_DEF_SENT_RECORD_TYPE,
     CredDefQueryStringSchema,
 )
-from ......messaging.decorators.attach_decorator3 import AttachDecorator
+from ......messaging.decorators.attach_decorator_didcomm_v2_cred import AttachDecorator
 from ......multitenant.base import BaseMultitenantManager
 from ......revocation.indy import IndyRevocation
 from ......revocation.models.issuer_cred_rev_record import IssuerCredRevRecord

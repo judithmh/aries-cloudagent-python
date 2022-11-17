@@ -5,7 +5,7 @@ from typing import Sequence
 from marshmallow import EXCLUDE, fields, validates_schema, ValidationError
 
 from .....messaging.agent_message import AgentMessage, AgentMessageSchemaV2
-from .....messaging.decorators.attach_decorator3 import (
+from .....messaging.decorators.attach_decorator_didcomm_v2_cred import (
     AttachDecorator,
     AttachDecoratorSchema,
 )

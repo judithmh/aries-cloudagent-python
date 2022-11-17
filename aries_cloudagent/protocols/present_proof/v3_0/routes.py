@@ -21,7 +21,7 @@ from ....indy.models.proof import IndyPresSpecSchema
 from ....indy.models.proof_request import IndyProofRequestSchema
 from ....indy.util import generate_pr_nonce
 from ....ledger.error import LedgerError
-from ....messaging.decorators.attach_decorator2 import AttachDecorator
+from ....messaging.decorators.attach_decorator_didcomm_v2_pres import AttachDecorator
 from ....messaging.models.base import BaseModelError
 from ....messaging.models.openapi import OpenAPISchema
 from ....messaging.valid import (

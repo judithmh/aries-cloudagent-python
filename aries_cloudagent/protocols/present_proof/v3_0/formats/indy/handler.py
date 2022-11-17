@@ -13,7 +13,7 @@ from ......indy.models.proof_request import IndyProofRequestSchema
 from ......indy.models.xform import indy_proof_req_preview2indy_requested_creds
 from ......indy.util import generate_pr_nonce
 from ......indy.verifier import IndyVerifier
-from ......messaging.decorators.attach_decorator2 import AttachDecorator
+from ......messaging.decorators.attach_decorator_didcomm_v2_pres import AttachDecorator
 from ......messaging.util import canon
 
 from ....indy.pres_exch_handler import IndyPresExchHandler

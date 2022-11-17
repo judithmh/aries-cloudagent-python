@@ -22,7 +22,7 @@ from .......cache.base import BaseCache
 from .......storage.record import StorageRecord
 from .......storage.error import StorageNotFoundError
 from .......messaging.credential_definitions.util import CRED_DEF_SENT_RECORD_TYPE
-from .......messaging.decorators.attach_decorator3 import AttachDecorator
+from .......messaging.decorators.attach_decorator_didcomm_v2_cred import AttachDecorator
 from .......indy.holder import IndyHolder
 from ....models.detail.indy import V30CredExRecordIndy
 from ....messages.cred_proposal import V30CredProposal

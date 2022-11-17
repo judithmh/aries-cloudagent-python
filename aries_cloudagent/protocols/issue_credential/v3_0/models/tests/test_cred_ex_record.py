@@ -1,7 +1,7 @@
 from asynctest import mock as async_mock, TestCase as AsyncTestCase
 
 from ......core.in_memory import InMemoryProfile
-from ......messaging.decorators.attach_decorator3 import AttachDecorator
+from ......messaging.decorators.attach_decorator_didcomm_v2_cred import AttachDecorator
 
 from ...message_types import ATTACHMENT_FORMAT, CRED_30_PROPOSAL
 from ...messages.cred_format import V30CredFormat

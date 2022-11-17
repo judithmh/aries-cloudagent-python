@@ -8,7 +8,7 @@ from typing import Mapping, Tuple, Sequence
 from uuid import uuid4
 
 from ......messaging.base_handler import BaseResponder
-from ......messaging.decorators.attach_decorator2 import AttachDecorator
+from ......messaging.decorators.attach_decorator_didcomm_v2_pres import AttachDecorator
 from ......storage.error import StorageNotFoundError
 from ......storage.vc_holder.base import VCHolder
 from ......storage.vc_holder.vc_record import VCRecord

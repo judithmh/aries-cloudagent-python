@@ -2,7 +2,7 @@ import pytest
 
 from unittest import TestCase
 
-from ......messaging.decorators.attach_decorator2 import AttachDecorator
+from ......messaging.decorators.attach_decorator_didcomm_v2_pres import AttachDecorator
 from ......messaging.models.base import BaseModelError
 
 from .....didcomm_prefix import DIDCommPrefix

@@ -11,7 +11,7 @@ from .....cache.in_memory import InMemoryCache
 from .....core.in_memory import InMemoryProfile
 from .....indy.issuer import IndyIssuer
 from .....messaging.decorators.thread_decorator import ThreadDecorator
-from .....messaging.decorators.attach_decorator3 import AttachDecorator
+from .....messaging.decorators.attach_decorator_didcomm_v2_cred import AttachDecorator
 from .....messaging.responder import BaseResponder, MockResponder
 from .....ledger.base import BaseLedger
 from .....storage.error import StorageNotFoundError

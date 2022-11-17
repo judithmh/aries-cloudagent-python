@@ -18,7 +18,7 @@ from .....ledger.base import BaseLedger
 from .....ledger.multiple_ledger.ledger_requests_executor import (
     IndyLedgerRequestsExecutor,
 )
-from .....messaging.decorators.attach_decorator2 import AttachDecorator
+from .....messaging.decorators.attach_decorator_didcomm_v2_pres import AttachDecorator
 from .....messaging.responder import BaseResponder, MockResponder
 from .....multitenant.base import BaseMultitenantManager
 from .....multitenant.manager import MultitenantManager

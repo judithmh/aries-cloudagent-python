@@ -8,7 +8,7 @@ from ......indy.models.pres_preview import (
     IndyPresPredSpec,
     IndyPresPreview,
 )
-from ......messaging.decorators.attach_decorator2 import AttachDecorator
+from ......messaging.decorators.attach_decorator_didcomm_v2_pres import AttachDecorator
 from ......messaging.models.base_record import BaseExchangeRecord, BaseExchangeSchema
 
 from ...message_types import ATTACHMENT_FORMAT, PRES_30_PROPOSAL

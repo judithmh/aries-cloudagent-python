@@ -1,7 +1,7 @@
 import pytest
 
 from asynctest import mock as async_mock, TestCase as AsyncTestCase
-from aries_cloudagent.messaging.decorators.attach_decorator2 import AttachDecorator
+from aries_cloudagent.messaging.decorators.attach_decorator_didcomm_v2_pres import AttachDecorator
 
 from aries_cloudagent.protocols.present_proof.v3_0.messages.pres_body import V30PresBody
 

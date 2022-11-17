@@ -4,7 +4,7 @@ from aries_cloudagent.protocols.issue_credential.v3_0.messages.cred_body import 
     V30CredBody,
 )
 
-from ......messaging.decorators.attach_decorator3 import AttachDecorator
+from ......messaging.decorators.attach_decorator_didcomm_v2_cred import AttachDecorator
 from ......messaging.models.base import BaseModelError
 
 from .....didcomm_prefix import DIDCommPrefix

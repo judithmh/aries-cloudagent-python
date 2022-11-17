@@ -23,7 +23,7 @@ from ....core.profile import Profile
 from ....indy.holder import IndyHolderError
 from ....indy.issuer import IndyIssuerError
 from ....ledger.error import LedgerError
-from ....messaging.decorators.attach_decorator3 import AttachDecorator
+from ....messaging.decorators.attach_decorator_didcomm_v2_cred import AttachDecorator
 from ....messaging.models.base import BaseModelError
 from ....messaging.models.openapi import OpenAPISchema
 from ....messaging.valid import (

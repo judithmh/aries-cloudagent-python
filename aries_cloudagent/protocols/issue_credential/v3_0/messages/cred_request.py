@@ -9,7 +9,7 @@ from aries_cloudagent.protocols.issue_credential.v3_0.messages.cred_format impor
 )
 
 from .....messaging.agent_message import AgentMessage, AgentMessageSchemaV2
-from .....messaging.decorators.attach_decorator3 import (
+from .....messaging.decorators.attach_decorator_didcomm_v2_cred import (
     AttachDecorator,
     AttachDecoratorSchema,
 )

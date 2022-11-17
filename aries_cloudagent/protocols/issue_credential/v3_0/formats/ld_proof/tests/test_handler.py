@@ -10,7 +10,7 @@ from .. import handler as test_module
 from .......core.in_memory import InMemoryProfile
 from .......storage.vc_holder.base import VCHolder
 from .......wallet.base import DIDInfo
-from .......messaging.decorators.attach_decorator3 import AttachDecorator
+from .......messaging.decorators.attach_decorator_didcomm_v2_cred import AttachDecorator
 from .......did.did_key import DIDKey
 from .......storage.vc_holder.vc_record import VCRecord
 from ..models.cred_detail import (

@@ -7,7 +7,7 @@ from .....messaging.agent_message import (
     AgentMessage,
     AgentMessageSchemaV2,
 )
-from .....messaging.decorators.attach_decorator2 import (
+from .....messaging.decorators.attach_decorator_didcomm_v2_pres import (
     AttachDecorator,
     AttachDecoratorSchema,
 )
