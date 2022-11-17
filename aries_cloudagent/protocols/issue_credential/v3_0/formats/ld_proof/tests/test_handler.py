@@ -26,9 +26,9 @@ from .......vc.ld_proofs import (
 )
 from .......vc.ld_proofs.constants import SECURITY_CONTEXT_BBS_URL
 from .......vc.tests.document_loader import custom_document_loader
-from .......wallet.key_type import KeyType
+from .......wallet.key_type import BLS12381G2, ED25519
 from .......wallet.error import WalletNotFoundError
-from .......wallet.did_method import DIDMethod
+from .......wallet.did_method import SOV
 from .......wallet.base import BaseWallet
 
 from ....models.detail.ld_proof import V30CredExRecordLDProof
@@ -216,8 +216,8 @@ class TestV30LDProofCredFormatHandler(AsyncTestCase):
                 did=TEST_DID_SOV,
                 verkey="verkey",
                 metadata={},
-                method=DIDMethod.SOV,
-                key_type=KeyType.ED25519,
+                method=SOV,
+                key_type=ED25519,
             )
             mock_did_info.return_value = did_info
             await self.handler._assert_can_issue_with_id_and_proof_type(
@@ -228,8 +228,8 @@ class TestV30LDProofCredFormatHandler(AsyncTestCase):
                 did=TEST_DID_SOV,
                 verkey="verkey",
                 metadata={},
-                method=DIDMethod.SOV,
-                key_type=KeyType.BLS12381G2,
+                method=SOV,
+                key_type=BLS12381G2,
             )
             mock_did_info.return_value = invalid_did_info
             with self.assertRaises(V30CredFormatError) as context:
@@ -280,7 +280,7 @@ class TestV30LDProofCredFormatHandler(AsyncTestCase):
             assert type(suite) == Ed25519Signature2018
             assert suite.verification_method == DIDKey.from_did(TEST_DID_KEY).key_id
             assert suite.proof == {"created": LD_PROOF_VC_DETAIL["options"]["created"]}
-            assert suite.key_pair.key_type == KeyType.ED25519
+            assert suite.key_pair.key_type == ED25519
             assert suite.key_pair.public_key_base58 == mock_did_info.return_value.verkey
 
             mock_can_issue.assert_called_once_with(
@@ -302,7 +302,7 @@ class TestV30LDProofCredFormatHandler(AsyncTestCase):
         assert type(suite) == BbsBlsSignature2020
         assert suite.verification_method == "verification_method"
         assert suite.proof == proof
-        assert suite.key_pair.key_type == KeyType.BLS12381G2
+        assert suite.key_pair.key_type == BLS12381G2
         assert suite.key_pair.public_key_base58 == did_info.verkey
 
         suite = await self.handler._get_suite(
@@ -315,7 +315,7 @@ class TestV30LDProofCredFormatHandler(AsyncTestCase):
         assert type(suite) == Ed25519Signature2018
         assert suite.verification_method == "verification_method"
         assert suite.proof == proof
-        assert suite.key_pair.key_type == KeyType.ED25519
+        assert suite.key_pair.key_type == ED25519
         assert suite.key_pair.public_key_base58 == did_info.verkey
 
     async def test_get_verification_method(self):
@@ -376,9 +376,6 @@ class TestV30LDProofCredFormatHandler(AsyncTestCase):
             cred_ex_record, deepcopy(LD_PROOF_VC_DETAIL)
         )
 
-        # not relevant for V30Cred:
-        # assert identifier match
-        # assert cred_format.attach_id == self.handler.format.api == attachment.ident
 
         # assert content of attachment is proposal data
         assert attachment.content == LD_PROOF_VC_DETAIL
@@ -420,9 +417,6 @@ class TestV30LDProofCredFormatHandler(AsyncTestCase):
                 LD_PROOF_VC_DETAIL["options"]["proofType"],
             )
 
-        # not relevant for V30Cred:
-        # assert identifier match
-        # assert cred_format.attach_id == self.handler.format.api == attachment.ident
 
         # assert content of attachment is proposal data
         assert attachment.content == LD_PROOF_VC_DETAIL
@@ -506,9 +500,6 @@ class TestV30LDProofCredFormatHandler(AsyncTestCase):
 
         (cred_format, attachment) = await self.handler.create_request(cred_ex_record)
 
-        # not relevant for V30Cred:
-        # assert identifier match
-        # assert cred_format.attach_id == self.handler.format.api == attachment.ident
 
         # assert content of attachment is proposal data
         assert attachment.content == LD_PROOF_VC_DETAIL
@@ -525,9 +516,6 @@ class TestV30LDProofCredFormatHandler(AsyncTestCase):
 
         (cred_format, attachment) = await self.handler.create_request(cred_ex_record)
 
-        # not relevant for V30Cred:
-        # assert identifier match
-        # assert cred_format.attach_id == self.handler.format.api == attachment.ident
 
         # assert content of attachment is proposal data
         assert attachment.content == LD_PROOF_VC_DETAIL
@@ -594,9 +582,6 @@ class TestV30LDProofCredFormatHandler(AsyncTestCase):
                 purpose=mock_get_proof_purpose.return_value,
             )
 
-            # not relevant for V30Cred:
-            # assert identifier match
-            # assert cred_format.attach_id == self.handler.format.api == attachment.ident
 
             # assert content of attachment is credential data
             assert attachment.content == LD_PROOF_VC
@@ -754,13 +739,14 @@ class TestV30LDProofCredFormatHandler(AsyncTestCase):
 
     async def test_receive_credential_x_credential_status_ne_both_set(self):
         detail = deepcopy(LD_PROOF_VC_DETAIL)
+        status_entry = {"type": "SomeRandomType"}
 
-        # Set credential status so it's only set on the detail
-        # not the issued credential
+        # Set credential status in both request and reference credential
         detail["options"]["credentialStatus"] = {"type": "CredentialStatusType"}
+        detail["credential"]["credentialStatus"] = deepcopy(status_entry)
 
         vc = deepcopy(LD_PROOF_VC)
-        vc["credentialStatus"] = {"type": "SomeRandomType"}
+        vc["credentialStatus"] = deepcopy(status_entry)
 
         cred_issue = V30CredIssue(
             attachments=[AttachDecorator.data_base64(vc, ident="0",

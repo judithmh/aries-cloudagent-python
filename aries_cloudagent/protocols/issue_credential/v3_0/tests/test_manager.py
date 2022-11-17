@@ -10,6 +10,7 @@ from .....cache.base import BaseCache
 from .....cache.in_memory import InMemoryCache
 from .....core.in_memory import InMemoryProfile
 from .....indy.issuer import IndyIssuer
+from .....messaging.decorators.thread_decorator import ThreadDecorator
 from .....messaging.decorators.attach_decorator3 import AttachDecorator
 from .....messaging.responder import BaseResponder, MockResponder
 from .....ledger.base import BaseLedger
@@ -112,12 +113,12 @@ class TestV30CredManager(AsyncTestCase):
         connection_id = "test_conn_id"
         cred_preview = V30CredPreview(
             _body=V30CredPreviewBody(
-                attributes=(
-                    V30CredAttrSpec(name="legalName", value="value"),
-                    V30CredAttrSpec(name="jurisdictionId", value="value"),
-                    V30CredAttrSpec(name="incorporationDate", value="value"),
-                )
+            attributes=(
+                V30CredAttrSpec(name="legalName", value="value"),
+                V30CredAttrSpec(name="jurisdictionId", value="value"),
+                V30CredAttrSpec(name="incorporationDate", value="value"),
             )
+        )
         )
         cred_proposal = V30CredProposal(
             _body=V30CredBody(credential_preview=cred_preview),
@@ -126,9 +127,9 @@ class TestV30CredManager(AsyncTestCase):
                     {"cred_def_id": CRED_DEF_ID, "schema_id": SCHEMA_ID},
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_PROPOSAL][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_PROPOSAL][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -153,12 +154,12 @@ class TestV30CredManager(AsyncTestCase):
         comment = "Test"
         cred_preview = V30CredPreview(
             _body=V30CredPreviewBody(
-                attributes=(
-                    V30CredAttrSpec(name="legalName", value="value"),
-                    V30CredAttrSpec(name="jurisdictionId", value="value"),
-                    V30CredAttrSpec(name="incorporationDate", value="value"),
-                )
+            attributes=(
+                V30CredAttrSpec(name="legalName", value="value"),
+                V30CredAttrSpec(name="jurisdictionId", value="value"),
+                V30CredAttrSpec(name="incorporationDate", value="value"),
             )
+        )
         )
 
         with async_mock.patch.object(
@@ -198,8 +199,6 @@ class TestV30CredManager(AsyncTestCase):
             )
 
         cred_proposal = cx_rec.cred_proposal
-        print("Cred ex")
-        print(cx_rec)
         assert not cred_proposal.attachment(
             V30CredFormat.Format.INDY
         ).keys()  # leave underspecified until offer receipt
@@ -264,12 +263,12 @@ class TestV30CredManager(AsyncTestCase):
 
         cred_preview = V30CredPreview(
             _body=V30CredPreviewBody(
-                attributes=(
-                    V30CredAttrSpec(name="legalName", value="value"),
-                    V30CredAttrSpec(name="jurisdictionId", value="value"),
-                    V30CredAttrSpec(name="incorporationDate", value="value"),
-                )
+            attributes=(
+                V30CredAttrSpec(name="legalName", value="value"),
+                V30CredAttrSpec(name="jurisdictionId", value="value"),
+                V30CredAttrSpec(name="incorporationDate", value="value"),
             )
+        )
         )
 
         with async_mock.patch.object(
@@ -287,9 +286,9 @@ class TestV30CredManager(AsyncTestCase):
                         {"cred_def_id": CRED_DEF_ID},
                         ident="0",
                         format=V30CredFormat(
-                            format_=ATTACHMENT_FORMAT[CRED_30_PROPOSAL][
-                                V30CredFormat.Format.INDY.api
-                            ],
+                        format_=ATTACHMENT_FORMAT[CRED_30_PROPOSAL][
+                            V30CredFormat.Format.INDY.api
+                        ],
                         ),
                     )
                 ],
@@ -320,12 +319,12 @@ class TestV30CredManager(AsyncTestCase):
 
         cred_preview = V30CredPreview(
             _body=V30CredPreviewBody(
-                attributes=(
-                    V30CredAttrSpec(name="legalName", value="value"),
-                    V30CredAttrSpec(name="jurisdictionId", value="value"),
-                    V30CredAttrSpec(name="incorporationDate", value="value"),
-                )
+            attributes=(
+                V30CredAttrSpec(name="legalName", value="value"),
+                V30CredAttrSpec(name="jurisdictionId", value="value"),
+                V30CredAttrSpec(name="incorporationDate", value="value"),
             )
+        )
         )
         cred_proposal = V30CredProposal(
             _body=V30CredBody(credential_preview=cred_preview),
@@ -334,9 +333,9 @@ class TestV30CredManager(AsyncTestCase):
                     {"cred_def_id": CRED_DEF_ID},
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_PROPOSAL][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_PROPOSAL][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -377,6 +376,7 @@ class TestV30CredManager(AsyncTestCase):
             (ret_cx_rec, ret_offer) = await self.manager.create_offer(
                 cred_ex_record=cx_rec,
                 counter_proposal=None,
+                replacement_id="0",
                 comment=comment,
             )
             assert ret_cx_rec == cx_rec
@@ -404,12 +404,12 @@ class TestV30CredManager(AsyncTestCase):
 
         cred_preview = V30CredPreview(
             _body=V30CredPreviewBody(
-                attributes=(
-                    V30CredAttrSpec(name="legalName", value="value"),
-                    V30CredAttrSpec(name="jurisdictionId", value="value"),
-                    V30CredAttrSpec(name="incorporationDate", value="value"),
-                )
+            attributes=(
+                V30CredAttrSpec(name="legalName", value="value"),
+                V30CredAttrSpec(name="jurisdictionId", value="value"),
+                V30CredAttrSpec(name="incorporationDate", value="value"),
             )
+        )
         )
         cred_proposal = V30CredProposal(
             _body=V30CredBody(credential_preview=cred_preview),
@@ -418,9 +418,9 @@ class TestV30CredManager(AsyncTestCase):
                     {"cred_def_id": CRED_DEF_ID},
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_PROPOSAL][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_PROPOSAL][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -505,12 +505,12 @@ class TestV30CredManager(AsyncTestCase):
 
         cred_preview = V30CredPreview(
             _body=V30CredPreviewBody(
-                attributes=(
-                    V30CredAttrSpec(name="legalName", value="value"),
-                    V30CredAttrSpec(name="jurisdictionId", value="value"),
-                    V30CredAttrSpec(name="incorporationDate", value="value"),
-                )
+            attributes=(
+                V30CredAttrSpec(name="legalName", value="value"),
+                V30CredAttrSpec(name="jurisdictionId", value="value"),
+                V30CredAttrSpec(name="incorporationDate", value="value"),
             )
+        )
         )
         cred_proposal = V30CredProposal(
             _body=V30CredBody(credential_preview=cred_preview),
@@ -519,9 +519,9 @@ class TestV30CredManager(AsyncTestCase):
                     {},
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_PROPOSAL][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_PROPOSAL][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -533,9 +533,9 @@ class TestV30CredManager(AsyncTestCase):
                     INDY_OFFER,
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_OFFER][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_OFFER][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -584,12 +584,12 @@ class TestV30CredManager(AsyncTestCase):
 
         cred_preview = V30CredPreview(
             _body=V30CredPreviewBody(
-                attributes=(
-                    V30CredAttrSpec(name="legalName", value="value"),
-                    V30CredAttrSpec(name="jurisdictionId", value="value"),
-                    V30CredAttrSpec(name="incorporationDate", value="value"),
-                )
+            attributes=(
+                V30CredAttrSpec(name="legalName", value="value"),
+                V30CredAttrSpec(name="jurisdictionId", value="value"),
+                V30CredAttrSpec(name="incorporationDate", value="value"),
             )
+        )
         )
         cred_offer = V30CredOffer(
             _body=V30CredBody(credential_preview=cred_preview),
@@ -598,9 +598,9 @@ class TestV30CredManager(AsyncTestCase):
                     INDY_OFFER,
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_OFFER][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_OFFER][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -645,9 +645,9 @@ class TestV30CredManager(AsyncTestCase):
                     INDY_OFFER,
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_OFFER][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_OFFER][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -701,7 +701,6 @@ class TestV30CredManager(AsyncTestCase):
                 stored_cx_rec, {"holder_did": holder_did}
             )
 
-            # assert ret_cred_req.attachment() == INDY_CRED_REQ
             assert ret_cred_req._thread_id == thread_id
 
             assert ret_cx_rec.state == V30CredExRecord.STATE_REQUEST_SENT
@@ -739,17 +738,21 @@ class TestV30CredManager(AsyncTestCase):
                     LD_PROOF_VC_DETAIL,
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_PROPOSAL][
-                            V30CredFormat.Format.LD_PROOF.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_PROPOSAL][
+                        V30CredFormat.Format.LD_PROOF.api
+                    ],
                     ),
                 )
             ],
         )
 
+        cred_offer = V30CredOffer(thread_id)
+        cred_offer._thread = ThreadDecorator(pthid="some-pthid")
+
         stored_cx_rec = V30CredExRecord(
             cred_ex_id="dummy-cxid",
             connection_id=connection_id,
+            cred_offer=cred_offer,
             initiator=V30CredExRecord.INITIATOR_SELF,
             role=V30CredExRecord.ROLE_HOLDER,
             thread_id=thread_id,
@@ -793,8 +796,8 @@ class TestV30CredManager(AsyncTestCase):
                 stored_cx_rec, {"holder_did": holder_did}
             )
 
-            # assert ret_cred_req.attachment() == LD_PROOF_VC_DETAIL
             assert ret_cred_req._thread_id == thread_id
+            assert ret_cred_req._thread.pthid == "some-pthid"
 
             assert ret_cx_rec.state == V30CredExRecord.STATE_REQUEST_SENT
 
@@ -817,10 +820,10 @@ class TestV30CredManager(AsyncTestCase):
         assert " state " in str(context.exception)
 
     async def test_receive_request(self):
-        connection_id = "test_conn_id"
+        mock_conn = async_mock.MagicMock(connection_id="test_conn_id")
         stored_cx_rec = V30CredExRecord(
             cred_ex_id="dummy-cxid",
-            connection_id=connection_id,
+            connection_id=mock_conn.connection_id,
             initiator=V30CredExRecord.INITIATOR_EXTERNAL,
             role=V30CredExRecord.ROLE_ISSUER,
             state=V30CredExRecord.STATE_OFFER_SENT,
@@ -831,9 +834,9 @@ class TestV30CredManager(AsyncTestCase):
                     INDY_CRED_REQ,
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_REQUEST][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_REQUEST][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -850,10 +853,13 @@ class TestV30CredManager(AsyncTestCase):
             mock_handler.return_value.receive_request = async_mock.CoroutineMock()
             # mock_retrieve.return_value = stored_cx_rec
 
-            cx_rec = await self.manager.receive_request(cred_request, connection_id)
+            cx_rec = await self.manager.receive_request(cred_request, mock_conn, None)
 
             mock_retrieve.assert_called_once_with(
-                self.session, connection_id, cred_request._thread_id
+                self.session,
+                "test_conn_id",
+                cred_request._thread_id,
+                role=V30CredExRecord.ROLE_ISSUER,
             )
             mock_handler.return_value.receive_request.assert_called_once_with(
                 cx_rec, cred_request
@@ -861,7 +867,6 @@ class TestV30CredManager(AsyncTestCase):
             mock_save.assert_called_once()
 
             assert cx_rec.state == V30CredExRecord.STATE_REQUEST_RECEIVED
-            # assert cx_rec.cred_request.attachment() == INDY_CRED_REQ
 
     async def test_receive_request_no_connection_cred_request(self):
         stored_cx_rec = V30CredExRecord(
@@ -877,46 +882,46 @@ class TestV30CredManager(AsyncTestCase):
                     INDY_CRED_REQ,
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_REQUEST][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_REQUEST][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
         )
+
+        mock_conn = async_mock.MagicMock(connection_id="test_conn_id")
+        mock_oob = async_mock.MagicMock()
 
         with async_mock.patch.object(
             V30CredExRecord, "save", autospec=True
         ) as mock_save, async_mock.patch.object(
             V30CredExRecord, "retrieve_by_conn_and_thread", async_mock.CoroutineMock()
         ) as mock_retrieve, async_mock.patch.object(
-            V30CredExRecord, "retrieve_by_tag_filter", async_mock.CoroutineMock()
-        ) as mock_retrieve_tag_filter, async_mock.patch.object(
             V30CredFormat.Format, "handler"
         ) as mock_handler:
-            mock_retrieve.side_effect = (StorageNotFoundError(),)
-            mock_retrieve_tag_filter.return_value = stored_cx_rec
+            mock_retrieve.return_value = stored_cx_rec
             mock_handler.return_value.receive_request = async_mock.CoroutineMock()
 
-            cx_rec = await self.manager.receive_request(cred_request, "test_conn_id")
+            cx_rec = await self.manager.receive_request(
+                cred_request, mock_conn, mock_oob
+            )
 
             mock_retrieve.assert_called_once_with(
-                self.session, "test_conn_id", cred_request._thread_id
-            )
-            mock_retrieve_tag_filter.assert_called_once_with(
                 self.session,
-                {"thread_id": cred_request._thread_id},
-                {"connection_id": None},
+                None,
+                cred_request._thread_id,
+                role=V30CredExRecord.ROLE_ISSUER,
             )
             mock_handler.return_value.receive_request.assert_called_once_with(
                 cx_rec, cred_request
             )
             mock_save.assert_called_once()
             assert cx_rec.state == V30CredExRecord.STATE_REQUEST_RECEIVED
-            # assert cx_rec.cred_request.attachment() == INDY_CRED_REQ
             assert cx_rec.connection_id == "test_conn_id"
 
     async def test_receive_request_no_cred_ex_with_offer_found(self):
+        mock_conn = async_mock.MagicMock(connection_id="test_conn_id")
         stored_cx_rec = V30CredExRecord(
             cred_ex_id="dummy-cxid",
             initiator=V30CredExRecord.INITIATOR_EXTERNAL,
@@ -930,9 +935,9 @@ class TestV30CredManager(AsyncTestCase):
                     INDY_CRED_REQ,
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_REQUEST][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_REQUEST][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -943,23 +948,18 @@ class TestV30CredManager(AsyncTestCase):
         ) as mock_save, async_mock.patch.object(
             V30CredExRecord, "retrieve_by_conn_and_thread", async_mock.CoroutineMock()
         ) as mock_retrieve, async_mock.patch.object(
-            V30CredExRecord, "retrieve_by_tag_filter", async_mock.CoroutineMock()
-        ) as mock_retrieve_tag_filter, async_mock.patch.object(
             V30CredFormat.Format, "handler"
         ) as mock_handler:
             mock_retrieve.side_effect = (StorageNotFoundError(),)
-            mock_retrieve_tag_filter.side_effect = (StorageNotFoundError(),)
             mock_handler.return_value.receive_request = async_mock.CoroutineMock()
 
-            cx_rec = await self.manager.receive_request(cred_request, "test_conn_id")
+            cx_rec = await self.manager.receive_request(cred_request, mock_conn, None)
 
             mock_retrieve.assert_called_once_with(
-                self.session, "test_conn_id", cred_request._thread_id
-            )
-            mock_retrieve_tag_filter.assert_called_once_with(
                 self.session,
-                {"thread_id": cred_request._thread_id},
-                {"connection_id": None},
+                "test_conn_id",
+                cred_request._thread_id,
+                role=V30CredExRecord.ROLE_ISSUER,
             )
             mock_handler.return_value.receive_request.assert_called_once_with(
                 cx_rec, cred_request
@@ -976,10 +976,10 @@ class TestV30CredManager(AsyncTestCase):
         }
         cred_preview = V30CredPreview(
             _body=V30CredPreviewBody(
-                attributes=[
-                    V30CredAttrSpec(name=k, value=v) for (k, v) in attr_values.items()
-                ]
-            )
+            attributes=[
+                V30CredAttrSpec(name=k, value=v) for (k, v) in attr_values.items()
+            ]
+        )
         )
         cred_proposal = V30CredProposal(
             _body=V30CredBody(credential_preview=cred_preview),
@@ -1004,9 +1004,9 @@ class TestV30CredManager(AsyncTestCase):
                     INDY_OFFER,
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_OFFER][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_OFFER][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1018,9 +1018,9 @@ class TestV30CredManager(AsyncTestCase):
                     INDY_CRED_REQ,
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_REQUEST][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_REQUEST][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1070,8 +1070,6 @@ class TestV30CredManager(AsyncTestCase):
                     ),
                 )
             )
-            print("rett")
-            print(stored_cx_rec)
             (ret_cx_rec, ret_cred_issue) = await self.manager.issue_credential(
                 stored_cx_rec, comment=comment
             )
@@ -1081,8 +1079,6 @@ class TestV30CredManager(AsyncTestCase):
                 ret_cx_rec
             )
 
-            # assert ret_cx_rec.cred_issue.attachment() == INDY_CRED
-            # assert ret_cred_issue.attachment() == INDY_CRED
             assert ret_cx_rec.state == V30CredExRecord.STATE_ISSUED
             assert ret_cred_issue._thread_id == thread_id
 
@@ -1136,9 +1132,9 @@ class TestV30CredManager(AsyncTestCase):
                     INDY_CRED_REQ,
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_REQUEST][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_REQUEST][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1158,9 +1154,9 @@ class TestV30CredManager(AsyncTestCase):
                     INDY_CRED,
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_ISSUE][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_ISSUE][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1184,16 +1180,18 @@ class TestV30CredManager(AsyncTestCase):
             )
 
             mock_retrieve.assert_called_once_with(
-                self.session, connection_id, cred_issue._thread_id
+                self.session,
+                connection_id,
+                cred_issue._thread_id,
+                role=V30CredExRecord.ROLE_HOLDER,
             )
             mock_save.assert_called_once()
             mock_handler.return_value.receive_credential.assert_called_once_with(
                 ret_cx_rec, cred_issue
             )
-            # assert ret_cx_rec.cred_issue.attachment() == INDY_CRED
             assert ret_cx_rec.state == V30CredExRecord.STATE_CREDENTIAL_RECEIVED
 
-    async def test_receive_cred_x_no_formats(self):
+    async def test_receive_cred_x_extra_formats(self):
         connection_id = "test_conn_id"
 
         cred_request = V30CredRequest(
@@ -1203,6 +1201,59 @@ class TestV30CredManager(AsyncTestCase):
                 )
             ],
         )
+
+        stored_cx_rec = V30CredExRecord(
+            cred_ex_id="dummy-cxid",
+            connection_id=connection_id,
+            initiator=V30CredExRecord.INITIATOR_EXTERNAL,
+            cred_request=cred_request,
+            role=V30CredExRecord.ROLE_ISSUER,
+        )
+
+        cred_issue = V30CredIssue(
+            attachments=[
+                AttachDecorator.data_base64(
+                    LD_PROOF_VC, ident="0", format=V30CredFormat(format_=ATTACHMENT_FORMAT[CRED_30_ISSUE][
+                        V30CredFormat.Format.INDY.api
+                    ])),
+                AttachDecorator.data_base64(
+                    LD_PROOF_VC, ident="1", format=V30CredFormat(format_=ATTACHMENT_FORMAT[CRED_30_ISSUE][
+                       V30CredFormat.Format.LD_PROOF.api
+                    ]))
+            ]
+
+        )
+
+        with async_mock.patch.object(
+            V30CredExRecord,
+            "retrieve_by_conn_and_thread",
+            async_mock.CoroutineMock(),
+        ) as mock_retrieve:
+            mock_retrieve.return_value = stored_cx_rec
+
+            with self.assertRaises(V30CredManagerError) as context:
+                await self.manager.receive_credential(
+                    cred_issue,
+                    connection_id,
+                )
+            assert (
+                "Received issue credential format(s) not present in credential"
+                in str(context.exception)
+            )
+
+    async def test_receive_cred_x_no_formats(self):
+        connection_id = "test_conn_id"
+
+        cred_request = V30CredRequest(
+            attachments=[
+                AttachDecorator.data_base64(
+                    INDY_CRED_REQ,
+                    ident="0",
+                    format=V30CredFormat(format_="random")
+        )],
+                )
+ 
+
 
         stored_cx_rec = V30CredExRecord(
             cred_ex_id="dummy-cxid",
@@ -1243,9 +1294,9 @@ class TestV30CredManager(AsyncTestCase):
                     INDY_CRED,
                     ident="0",
                     format=V30CredFormat(
-                        format_=ATTACHMENT_FORMAT[CRED_30_ISSUE][
-                            V30CredFormat.Format.INDY.api
-                        ],
+                    format_=ATTACHMENT_FORMAT[CRED_30_ISSUE][
+                        V30CredFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1281,7 +1332,6 @@ class TestV30CredManager(AsyncTestCase):
                 ret_cx_rec, cred_id
             )
 
-            # assert ret_cx_rec.cred_issue.attachment() == INDY_CRED
             assert ret_cx_rec.state == V30CredExRecord.STATE_CREDENTIAL_RECEIVED
 
     async def test_store_credential_bad_state(self):
@@ -1362,6 +1412,7 @@ class TestV30CredManager(AsyncTestCase):
                 self.session,
                 connection_id,
                 ack._thread_id,
+                role=V30CredExRecord.ROLE_ISSUER,
             )
             mock_save.assert_called_once()
 
