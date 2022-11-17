@@ -2,10 +2,11 @@
 
 import logging
 
-from marshmallow import RAISE
+import asyncio
 import json
 from typing import Mapping, Tuple
-import asyncio
+from marshmallow import RAISE
+
 
 from ......cache.base import BaseCache
 from ......indy.issuer import IndyIssuer, IndyIssuerRevocationRegistryFullError
@@ -146,7 +147,7 @@ class IndyCredFormatHandler(V30CredFormatHandler):
         """
         format = V30CredFormat(
             # attach_id=IndyCredFormatHandler.format.api,
-                format_=self.get_format_identifier(message_type),
+            format_=self.get_format_identifier(message_type),
         )
         return (
             format,
@@ -334,8 +335,10 @@ class IndyCredFormatHandler(V30CredFormatHandler):
         cred_request = cred_ex_record.cred_request.attachment(
             IndyCredFormatHandler.format
         )
-        cred_values = cred_ex_record.cred_offer._body.credential_preview._body.attr_dict(
-            decode=False
+        cred_values = (
+            cred_ex_record.cred_offer._body.credential_preview._body.attr_dict(
+                decode=False
+            )
         )
         schema_id = cred_offer["schema_id"]
         cred_def_id = cred_offer["cred_def_id"]

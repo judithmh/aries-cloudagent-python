@@ -71,8 +71,9 @@ class V30PresRequestHandler(BaseHandler):
                 pres_ex_record = await V30PresExRecord.retrieve_by_tag_filter(
                     session,
                     {"thread_id": context.message._thread_id},
-                    {"connection_id": context.connection_record.connection_id
-                    ,"role": V30PresExRecord.ROLE_PROVER,
+                    {
+                        "connection_id": context.connection_record.connection_id,
+                        "role": V30PresExRecord.ROLE_PROVER,
                     },
                 )  # holder initiated via proposal
             pres_ex_record.pres_request = context.message

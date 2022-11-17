@@ -6,7 +6,7 @@ from typing import Mapping, Optional, Tuple
 
 from ....connections.models.conn_record import ConnRecord
 from ....core.oob_processor import OobRecord
-from aries_cloudagent.protocols.issue_credential.v3_0.messages.cred_body import (
+from ....protocols.issue_credential.v3_0.messages.cred_body import (
     V30CredBody,
 )
 
@@ -251,7 +251,7 @@ class V30CredManager:
         cred_offer_message = V30CredOffer(
             _body=V30CredBody(
                 comment=comment,
-            replacement_id=replacement_id,
+                replacement_id=replacement_id,
                 credential_preview=cred_proposal_message._body.credential_preview,
             ),
             attachments=[attach for (_, attach) in formats],

@@ -346,7 +346,7 @@ def _formats_attach(by_format: Mapping, msg_type: str, spec: str) -> Mapping:
             attach.append(
                 AttachDecorator.data_json(
                     mapping=item_by_fmt, ident=fmt_api, format=format
-            )
+                )
             )
     return attach
 

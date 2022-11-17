@@ -389,7 +389,7 @@ def _formats_filters(filt_spec: Mapping) -> Mapping:
                 AttachDecorator.data_base64(
                     mapping=filt_by_fmt, ident=fmt_api, format=format
                 )
-    )
+            )
 
     return attach
 
@@ -1054,8 +1054,8 @@ async def credential_exchange_send_bound_offer(request: web.BaseRequest):
             cred_ex_record,
             counter_proposal=V30CredProposal(
                 _body=V30CredBody(
-                comment=None,
-                credential_preview=V30CredPreview.deserialize(preview_spec),
+                    comment=None,
+                    credential_preview=V30CredPreview.deserialize(preview_spec),
                 ),
                 attachments=_formats_filters(filt_spec),
             )

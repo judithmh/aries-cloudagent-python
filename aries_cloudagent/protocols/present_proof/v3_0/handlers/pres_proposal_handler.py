@@ -72,7 +72,7 @@ class V30PresProposalHandler(BaseHandler):
                     pres_request_message,
                 ) = await pres_manager.create_bound_request(
                     pres_ex_record=pres_ex_record,
-                    comment=comment,  
+                    comment=comment,
                 )
                 await responder.send_reply(pres_request_message)
             except (BaseModelError, LedgerError, StorageError) as err:

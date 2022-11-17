@@ -1,7 +1,8 @@
 """A presentation proposal content message."""
 
-from marshmallow import EXCLUDE, fields, validates_schema, ValidationError
 from typing import Sequence
+from marshmallow import EXCLUDE, fields, validates_schema, ValidationError
+
 
 from .....messaging.agent_message import AgentMessage, AgentMessageSchemaV2
 from .....messaging.decorators.attach_decorator_didcomm_v2_pres import (
@@ -81,8 +82,8 @@ class V30PresProposalSchema(AgentMessageSchemaV2):
         V30PresBodySchema(only=("comment", "goal_code")),
         comment="Human-readable comment",
         description="Body descriptor with GoalCode made for PresProof",
-        data_key="body", 
-        #TODO: add example
+        data_key="body",
+        # TODO: add example
         example="",
         required=True,
         allow_none=False,

@@ -3,8 +3,10 @@
 import json
 import logging
 
-from marshmallow import RAISE
+
 from typing import Mapping, Tuple
+from marshmallow import RAISE
+
 
 from ......indy.holder import IndyHolder
 from ......indy.models.predicate import Predicate
@@ -132,7 +134,6 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
             indy_proof_request["nonce"] = await generate_pr_nonce()
         return self.get_format_data(PRES_30_REQUEST, indy_proof_request)
 
-
     async def create_pres(
         self,
         pres_ex_record: V30PresExRecord,
@@ -180,7 +181,7 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
         def _check_proof_vs_proposal():
             """Check for bait and switch in presented values vs. proposal request."""
             proof_req = pres_ex_record.pres_request.attachments
-            
+
             for att in proof_req:
                 if (
                     V30PresFormat.Format.get(att.format.format).api
@@ -253,7 +254,7 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
                 if (
                     not any(r.items() <= criteria.items() for r in req_restrictions)
                     and len(req_restrictions) != 0
-                    ):
+                ):
                     raise V30PresFormatHandlerError(
                         f"Presented attr group {reft} does not satisfy proof request "
                         f"restrictions {req_restrictions}"
@@ -306,13 +307,15 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
                     "issuer_did": cred_def_id.split(":")[-5],
                 }
 
-                if (not any(r.items() <= criteria.items() for r in req_restrictions)
+                if (
+                    not any(r.items() <= criteria.items() for r in req_restrictions)
                     and len(req_restrictions) != 0
-                    ):
+                ):
                     raise V30PresFormatHandlerError(
                         f"Presented predicate {reft} does not satisfy proof request "
                         f"restrictions {req_restrictions}"
                     )
+
         proof = message.attachments
         for att in proof:
             if (
@@ -360,12 +363,12 @@ class IndyPresExchangeHandler(V30PresFormatHandler):
         verifier = self._profile.inject(IndyVerifier)
         pres_ex_record.verified = json.dumps(  # tag: needs string value
             await verifier.verify_presentation(
-            indy_proof_request,
-            indy_proof,
-            schemas,
-            cred_defs,
-            rev_reg_defs,
-            rev_reg_entries,
-        )
+                indy_proof_request,
+                indy_proof,
+                schemas,
+                cred_defs,
+                rev_reg_defs,
+                rev_reg_entries,
+            )
         )
         return pres_ex_record

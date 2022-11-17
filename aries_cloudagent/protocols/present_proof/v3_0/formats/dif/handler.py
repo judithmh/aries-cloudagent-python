@@ -3,9 +3,10 @@
 import json
 import logging
 
-from marshmallow import RAISE
 from typing import Mapping, Tuple, Sequence
 from uuid import uuid4
+from marshmallow import RAISE
+
 
 from ......messaging.base_handler import BaseResponder
 from ......messaging.decorators.attach_decorator_didcomm_v2_pres import AttachDecorator
@@ -122,10 +123,10 @@ class DIFPresFormatHandler(V30PresFormatHandler):
     ) -> Tuple[V30PresFormat, AttachDecorator]:
         """Get presentation format and attach objects for use in pres_ex messages."""
 
-        #TODO: Check if returning 1 format would be ok 
+        # TODO: Check if returning 1 format would be ok
         format = V30PresFormat(
             # attach_id=DIFPresFormatHandler.format.api,
-                format_=self.get_format_identifier(message_type),
+            format_=self.get_format_identifier(message_type),
         )
         return (
             format,
@@ -436,7 +437,7 @@ class DIFPresFormatHandler(V30PresFormatHandler):
         dif_handler = DIFPresExchHandler(self._profile)
         dif_proof_atch = message.attachments
         dif_proof = None
-        #TODO check if dif_proof it actually contains vals 
+        # TODO check if dif_proof it actually contains vals
         for att in dif_proof_atch:
             if (
                 V30PresFormat.Format.get(att.format.format).api
@@ -487,8 +488,8 @@ class DIFPresFormatHandler(V30PresFormatHandler):
         """
         async with self._profile.session() as session:
             wallet = session.inject(BaseWallet)
-            
-            #TODO: check check if dif_proof contains vals afterwards
+
+            # TODO: check check if dif_proof contains vals afterwards
             dif_proof_atch = pres_ex_record.pres.attachments
             dif_proof = None
             for att in dif_proof_atch:

@@ -1,7 +1,8 @@
 """A presentation request content message."""
 
-from marshmallow import EXCLUDE, fields, validates_schema, ValidationError
 from typing import Sequence
+from marshmallow import EXCLUDE, fields, validates_schema, ValidationError
+
 
 from .....messaging.agent_message import AgentMessage, AgentMessageSchemaV2
 from .....messaging.decorators.attach_decorator_didcomm_v2_pres import (
@@ -77,7 +78,7 @@ class V30PresRequestSchema(AgentMessageSchemaV2):
         V30PresBodySchema,  # including will_confirm
         comment="Human-readable comment",
         description="Body descriptor with GoalCode made for PresProof",
-        data_key="body", 
+        data_key="body",
         example="hier könnt ihr body-example stehen",
         required=True,
         allow_none=False,
@@ -98,7 +99,6 @@ class V30PresRequestSchema(AgentMessageSchemaV2):
         formats = []
         for atch in attachments:
             formats.append(atch.format)
-        
 
         if len(formats) != len(attachments):
             raise ValidationError("Formats/attachments length mismatch")

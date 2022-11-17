@@ -612,7 +612,6 @@ class AgentMessageSchema(BaseModelSchema):
         return data
 
 
-
 class AgentMessageSchemaV2(BaseModelSchema):
     """AgentMessage schema."""
 
@@ -750,7 +749,7 @@ class AgentMessageSchemaV2(BaseModelSchema):
 
         """
         result = OrderedDict()
-        #TODO: change this to type, id 
+        # TODO: change this to type, id
         for key in ("@type", "@id"):
             if key in data:
                 result[key] = data.pop(key)

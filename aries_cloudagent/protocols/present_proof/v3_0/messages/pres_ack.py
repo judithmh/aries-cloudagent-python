@@ -39,7 +39,7 @@ class V30PresAckSchema(V10AckSchema):
 
         model_class = V30PresAck
         unknown = EXCLUDE
-    
+
 
 verification_result = fields.Str(
     required=False,
