@@ -833,12 +833,6 @@ class TestPresRequestHandler(AsyncTestCase):
         )
         request_context.message_receipt = MessageReceipt()
         pres_proposal = V30PresProposal(
-            # formats=[
-            #     V30PresFormat(
-            #         attach_id="indy",
-            #         format_=V30PresFormat.Format.INDY.aries,
-            #     )
-            # ],
             attachments=[
                 AttachDecorator.data_base64(INDY_PROOF_REQ, ident="indy",
                 format = V30PresFormat(

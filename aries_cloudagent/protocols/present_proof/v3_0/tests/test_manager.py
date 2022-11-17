@@ -477,7 +477,7 @@ class TestV30PresManager(AsyncTestCase):
         Verifier = async_mock.MagicMock(IndyVerifier, autospec=True)
         self.verifier = Verifier()
         self.verifier.verify_presentation = async_mock.CoroutineMock(
-            return_value="true"
+            return_value=("true", [])
         )
         injector.bind_instance(IndyVerifier, self.verifier)
 
@@ -517,7 +517,15 @@ class TestV30PresManager(AsyncTestCase):
                 assert diff[i] == diff[j] if i == j else diff[i] != diff[j]
 
     async def test_create_exchange_for_proposal(self):
-        proposal = V30PresProposal()
+        proposal = V30PresProposal(
+            attachments=[
+                AttachDecorator.data_base64(INDY_PROOF_REQ_NAME, ident="indy",
+                format = V30PresFormat(
+                    format_=V30PresFormat.Format.INDY.aries,
+                )
+                )
+            ],
+        )
 
         with async_mock.patch.object(
             V30PresExRecord, "save", autospec=True
@@ -536,7 +544,15 @@ class TestV30PresManager(AsyncTestCase):
 
     async def test_receive_proposal(self):
         connection_record = async_mock.MagicMock(connection_id=CONN_ID)
-        proposal = V30PresProposal()
+        proposal = V30PresProposal(
+            attachments=[
+                AttachDecorator.data_base64(INDY_PROOF_REQ_NAME, ident="indy",
+                format = V30PresFormat(
+                    format_=V30PresFormat.Format.INDY.aries,
+                )
+                )
+            ],
+        )
         with async_mock.patch.object(V30PresExRecord, "save", autospec=True) as save_ex:
             px_rec = await self.manager.receive_pres_proposal(
                 proposal,
@@ -557,8 +573,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -592,8 +608,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -613,7 +629,6 @@ class TestV30PresManager(AsyncTestCase):
     async def test_create_bound_request_no_format(self):
         px_rec = V30PresExRecord(
             pres_proposal=V30PresProposal(
-                # formats=[],
                 attachments=[],
                 body=V30PresBody(),
             ).serialize(),
@@ -656,8 +671,8 @@ class TestV30PresManager(AsyncTestCase):
                         ident="dif",
                         format=V30PresFormat(
                             format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                                V30PresFormat.Format.DIF.api
-                            ],
+                            V30PresFormat.Format.DIF.api
+                        ],
                         ),
                     )
                 ],
@@ -700,10 +715,10 @@ class TestV30PresManager(AsyncTestCase):
                     DIF_PRES_REQ,
                     ident="dif",
                     format=V30PresFormat(
-                        attach_id="dif",
+                    attach_id="dif",
                         format_=ATTACHMENT_FORMAT[PRES_30][
-                            V30PresFormat.Format.DIF.api
-                        ],
+                        V30PresFormat.Format.DIF.api
+                    ],
                     ),
                 )
             ],
@@ -718,22 +733,16 @@ class TestV30PresManager(AsyncTestCase):
             V30PresExRecord, "retrieve_by_tag_filter", autospec=True
         ) as retrieve_ex:
             mock_receive_pres.return_value = False
-            retrieve_ex.side_effect = [
-                StorageNotFoundError("no such record"),  # cover out-of-band
-                px_rec,
-            ]
+            retrieve_ex.side_effect = [px_rec]
             with self.assertRaises(V30PresManagerError) as context:
-                await self.manager.receive_pres(
-                    pres_x,
-                    connection_record,
-                )
+                await self.manager.receive_pres(pres_x, connection_record, None)
             assert "Unable to verify received presentation." in str(context.exception)
 
     async def test_create_exchange_for_request(self):
         pres_req = V30PresRequest(
             body=V30PresBody(
-                comment="Test",
-                will_confirm=True,
+            comment="Test",
+            will_confirm=True,
             ),
             attachments=[
                 AttachDecorator.data_base64(
@@ -741,8 +750,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -776,8 +785,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -826,8 +835,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -883,8 +892,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -943,8 +952,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1029,8 +1038,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1103,8 +1112,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1202,8 +1211,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1243,8 +1252,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1280,8 +1289,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1294,8 +1303,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1314,6 +1323,7 @@ class TestV30PresManager(AsyncTestCase):
                 )
             ],
         )
+        pres.assign_thread_id("thread-id")
 
         px_rec_dummy = V30PresExRecord(
             pres_proposal=pres_proposal.serialize(),
@@ -1335,12 +1345,13 @@ class TestV30PresManager(AsyncTestCase):
             "session",
             async_mock.MagicMock(return_value=self.profile.session()),
         ) as session:
-            retrieve_ex.side_effect = [
-                StorageNotFoundError("no such record"),  # cover out-of-band
-                px_rec_dummy,
-            ]
-            px_rec_out = await self.manager.receive_pres(pres, connection_record)
-            assert retrieve_ex.call_count == 2
+            retrieve_ex.side_effect = [px_rec_dummy]
+            px_rec_out = await self.manager.receive_pres(pres, connection_record, None)
+            retrieve_ex.assert_called_once_with(
+                session.return_value,
+                {"thread_id": "thread-id"},
+                {"role": V30PresExRecord.ROLE_VERIFIER, "connection_id": CONN_ID},
+            )
             save_ex.assert_called_once()
             assert px_rec_out.state == (V30PresExRecord.STATE_PRESENTATION_RECEIVED)
 
@@ -1354,8 +1365,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1372,8 +1383,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1392,6 +1403,7 @@ class TestV30PresManager(AsyncTestCase):
                 )
             ],
         )
+        pres.assign_thread_id("thread-id")
 
         px_rec_dummy = V30PresExRecord(
             pres_proposal=pres_proposal.serialize(),
@@ -1413,12 +1425,181 @@ class TestV30PresManager(AsyncTestCase):
             "session",
             async_mock.MagicMock(return_value=self.profile.session()),
         ) as session:
-            retrieve_ex.side_effect = [
-                StorageNotFoundError("no such record"),  # cover out-of-band
-                px_rec_dummy,
-            ]
-            px_rec_out = await self.manager.receive_pres(pres, connection_record)
-            assert retrieve_ex.call_count == 2
+            retrieve_ex.side_effect = [px_rec_dummy]
+            px_rec_out = await self.manager.receive_pres(pres, connection_record, None)
+            retrieve_ex.assert_called_once_with(
+                session.return_value,
+                {"thread_id": "thread-id"},
+                {"role": V30PresExRecord.ROLE_VERIFIER, "connection_id": CONN_ID},
+            )
+            save_ex.assert_called_once()
+            assert px_rec_out.state == (V30PresExRecord.STATE_PRESENTATION_RECEIVED)
+
+    async def test_receive_pres_indy_no_predicate_restrictions(self):
+        connection_record = async_mock.MagicMock(connection_id=CONN_ID)
+        indy_proof_req = {
+            "name": PROOF_REQ_NAME,
+            "version": PROOF_REQ_VERSION,
+            "nonce": PROOF_REQ_NONCE,
+            "requested_attributes": {
+                "0_player_uuid": {
+                    "name": "player",
+                    "restrictions": [{"cred_def_id": CD_ID}],
+                    "non_revoked": {"from": NOW, "to": NOW},
+                },
+                "0_screencapture_uuid": {
+                    "name": "screenCapture",
+                    "restrictions": [{"cred_def_id": CD_ID}],
+                    "non_revoked": {"from": NOW, "to": NOW},
+                },
+            },
+            "requested_predicates": {
+                "0_highscore_GE_uuid": {
+                    "name": "highScore",
+                    "p_type": ">=",
+                    "p_value": 1000000,
+                    "restrictions": [],
+                    "non_revoked": {"from": NOW, "to": NOW},
+                }
+            },
+        }
+        pres_request = V30PresRequest(
+            body=V30PresBody(),
+            attachments=[
+                AttachDecorator.data_base64(
+                    indy_proof_req,
+                    ident="indy",
+                    format=V30PresFormat(
+                        format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
+                        V30PresFormat.Format.INDY.api
+                    ],
+                    ),
+                )
+            ],
+        )
+        pres = V30Pres(
+            body=V30PresBody(),
+            attachments=[
+                AttachDecorator.data_base64(
+                    INDY_PROOF,
+                    ident="indy",
+                    format=V30PresFormat(
+                        format_=ATTACHMENT_FORMAT[PRES_30][
+                            V30PresFormat.Format.INDY.api
+                        ],
+                    ),
+                )
+            ],
+        )
+        pres.assign_thread_id("thread-id")
+
+        px_rec_dummy = V30PresExRecord(
+            pres_request=pres_request.serialize(),
+        )
+
+        # cover by_format property
+        by_format = px_rec_dummy.by_format
+
+        assert by_format.get("pres_request").get("indy") == indy_proof_req
+
+        with async_mock.patch.object(
+            V30PresExRecord, "save", autospec=True
+        ) as save_ex, async_mock.patch.object(
+            V30PresExRecord, "retrieve_by_tag_filter", autospec=True
+        ) as retrieve_ex, async_mock.patch.object(
+            self.profile,
+            "session",
+            async_mock.MagicMock(return_value=self.profile.session()),
+        ) as session:
+            retrieve_ex.side_effect = [px_rec_dummy]
+            px_rec_out = await self.manager.receive_pres(pres, connection_record, None)
+            retrieve_ex.assert_called_once_with(
+                session.return_value,
+                {"thread_id": "thread-id"},
+                {"role": V30PresExRecord.ROLE_VERIFIER, "connection_id": CONN_ID},
+            )
+            save_ex.assert_called_once()
+            assert px_rec_out.state == (V30PresExRecord.STATE_PRESENTATION_RECEIVED)
+
+    async def test_receive_pres_indy_no_attr_restrictions(self):
+        connection_record = async_mock.MagicMock(connection_id=CONN_ID)
+        indy_proof_req = {
+            "name": PROOF_REQ_NAME,
+            "version": PROOF_REQ_VERSION,
+            "nonce": PROOF_REQ_NONCE,
+            "requested_attributes": {
+                "0_player_uuid": {
+                    "name": "player",
+                    "restrictions": [],
+                    "non_revoked": {"from": NOW, "to": NOW},
+                }
+            },
+            "requested_predicates": {},
+        }
+        proof = deepcopy(INDY_PROOF)
+        proof["requested_proof"]["revealed_attrs"] = {
+            "0_player_uuid": {
+                "sub_proof_index": 0,
+                "raw": "Richie Knucklez",
+                "encoded": "516439982",
+            }
+        }
+        proof["requested_proof"]["predicates"] = {}
+        pres_request = V30PresRequest(
+            body=V30PresBody(),
+            attachments=[
+                AttachDecorator.data_base64(
+                    indy_proof_req,
+                    ident="indy",
+                    format=V30PresFormat(
+                        format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
+                        V30PresFormat.Format.INDY.api
+                    ],
+                    ),
+                )
+            ],
+        )
+        pres = V30Pres(
+            body=V30PresBody(),
+            attachments=[
+                AttachDecorator.data_base64(
+                    proof,
+                    ident="indy",
+                    format=V30PresFormat(
+                        format_=ATTACHMENT_FORMAT[PRES_30][
+                            V30PresFormat.Format.INDY.api
+                        ],
+                    ),
+                )
+            ],
+        )
+
+        pres.assign_thread_id("thread-id")
+
+        px_rec_dummy = V30PresExRecord(
+            pres_request=pres_request.serialize(),
+        )
+        # cover by_format property
+        by_format = px_rec_dummy.by_format
+
+        assert by_format.get("pres_request").get("indy") == indy_proof_req
+
+        with async_mock.patch.object(
+            V30PresExRecord, "save", autospec=True
+        ) as save_ex, async_mock.patch.object(
+            V30PresExRecord, "retrieve_by_tag_filter", autospec=True
+        ) as retrieve_ex, async_mock.patch.object(
+            self.profile,
+            "session",
+            async_mock.MagicMock(return_value=self.profile.session()),
+        ) as session:
+            retrieve_ex.side_effect = [px_rec_dummy]
+            px_rec_out = await self.manager.receive_pres(pres, connection_record, None)
+            retrieve_ex.assert_called_once_with(
+                session.return_value,
+                {"thread_id": "thread-id"},
+                {"role": V30PresExRecord.ROLE_VERIFIER, "connection_id": CONN_ID},
+            )
             save_ex.assert_called_once()
             assert px_rec_out.state == (V30PresExRecord.STATE_PRESENTATION_RECEIVED)
 
@@ -1438,8 +1619,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1452,8 +1633,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1467,7 +1648,7 @@ class TestV30PresManager(AsyncTestCase):
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30][
                             V30PresFormat.Format.INDY.api
-                        ],
+            ],
                     ),
                 )
             ],
@@ -1484,7 +1665,7 @@ class TestV30PresManager(AsyncTestCase):
         ) as retrieve_ex:
             retrieve_ex.return_value = px_rec_dummy
             with self.assertRaises(V30PresFormatHandlerError) as context:
-                await self.manager.receive_pres(pres_x, connection_record)
+                await self.manager.receive_pres(pres_x, connection_record, None)
             assert "does not satisfy proof request restrictions" in str(
                 context.exception
             )
@@ -1500,8 +1681,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1547,7 +1728,7 @@ class TestV30PresManager(AsyncTestCase):
         ) as retrieve_ex:
             retrieve_ex.return_value = px_rec_dummy
             with self.assertRaises(V30PresFormatHandlerError) as context:
-                await self.manager.receive_pres(pres_x, connection_record)
+                await self.manager.receive_pres(pres_x, connection_record, None)
             assert "Presentation referent" in str(context.exception)
 
     async def test_receive_pres_bait_and_switch_attr_names(self):
@@ -1564,8 +1745,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1578,8 +1759,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1611,7 +1792,7 @@ class TestV30PresManager(AsyncTestCase):
         ) as retrieve_ex:
             retrieve_ex.return_value = px_rec_dummy
             with self.assertRaises(V30PresFormatHandlerError) as context:
-                await self.manager.receive_pres(pres_x, connection_record)
+                await self.manager.receive_pres(pres_x, connection_record, None)
             assert "does not satisfy proof request restrictions " in str(
                 context.exception
             )
@@ -1627,8 +1808,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1674,7 +1855,7 @@ class TestV30PresManager(AsyncTestCase):
         ) as retrieve_ex:
             retrieve_ex.return_value = px_rec_dummy
             with self.assertRaises(V30PresFormatHandlerError) as context:
-                await self.manager.receive_pres(pres_x, connection_record)
+                await self.manager.receive_pres(pres_x, connection_record, None)
             assert "Presentation referent" in str(context.exception)
 
     async def test_receive_pres_bait_and_switch_pred(self):
@@ -1689,8 +1870,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1703,8 +1884,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1718,7 +1899,7 @@ class TestV30PresManager(AsyncTestCase):
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30][
                             V30PresFormat.Format.INDY.api
-                        ],
+            ],
                     ),
                 )
             ],
@@ -1736,7 +1917,7 @@ class TestV30PresManager(AsyncTestCase):
         ) as retrieve_ex:
             retrieve_ex.return_value = px_rec_dummy
             with self.assertRaises(V30PresFormatHandlerError) as context:
-                await self.manager.receive_pres(pres_x, connection_record)
+                await self.manager.receive_pres(pres_x, connection_record, None)
             assert "not in proposal request" in str(context.exception)
 
         indy_proof_req["requested_predicates"]["0_highscore_GE_uuid"] = {
@@ -1754,8 +1935,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1801,7 +1982,7 @@ class TestV30PresManager(AsyncTestCase):
         ) as retrieve_ex:
             retrieve_ex.return_value = px_rec_dummy
             with self.assertRaises(V30PresFormatHandlerError) as context:
-                await self.manager.receive_pres(pres_x, connection_record)
+                await self.manager.receive_pres(pres_x, connection_record, None)
             assert "shenanigans not in presentation" in str(context.exception)
 
         indy_proof_req["requested_predicates"]["0_highscore_GE_uuid"] = {
@@ -1819,8 +2000,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1866,7 +2047,7 @@ class TestV30PresManager(AsyncTestCase):
         ) as retrieve_ex:
             retrieve_ex.return_value = px_rec_dummy
             with self.assertRaises(V30PresFormatHandlerError) as context:
-                await self.manager.receive_pres(pres_x, connection_record)
+                await self.manager.receive_pres(pres_x, connection_record, None)
             assert "highScore mismatches proposal request" in str(context.exception)
 
         indy_proof_req["requested_predicates"]["0_highscore_GE_uuid"] = {
@@ -1884,8 +2065,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1913,7 +2094,7 @@ class TestV30PresManager(AsyncTestCase):
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30][
                             V30PresFormat.Format.INDY.api
-                        ],
+            ],
                     ),
                 )
             ],
@@ -1931,7 +2112,7 @@ class TestV30PresManager(AsyncTestCase):
         ) as retrieve_ex:
             retrieve_ex.return_value = px_rec_dummy
             with self.assertRaises(V30PresFormatHandlerError) as context:
-                await self.manager.receive_pres(pres_x, connection_record)
+                await self.manager.receive_pres(pres_x, connection_record, None)
             assert "does not satisfy proof request restrictions " in str(
                 context.exception
             )
@@ -1945,8 +2126,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.INDY.api
-                        ],
+                        V30PresFormat.Format.INDY.api
+                    ],
                     ),
                 )
             ],
@@ -1960,7 +2141,7 @@ class TestV30PresManager(AsyncTestCase):
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30][
                             V30PresFormat.Format.INDY.api
-                        ],
+            ],
                     ),
                 )
             ],
@@ -1993,13 +2174,31 @@ class TestV30PresManager(AsyncTestCase):
         messages = responder.messages
         assert len(messages) == 1
 
+        px_rec = V30PresExRecord(verified="true")
+
+        responder = MockResponder()
+        self.profile.context.injector.bind_instance(BaseResponder, responder)
+
+        await self.manager.send_pres_ack(px_rec)
+        messages = responder.messages
+        assert len(messages) == 1
+
+        px_rec = V30PresExRecord(verified="false")
+
+        responder = MockResponder()
+        self.profile.context.injector.bind_instance(BaseResponder, responder)
+
+        await self.manager.send_pres_ack(px_rec)
+        messages = responder.messages
+        assert len(messages) == 1
+
     async def test_send_pres_ack_no_responder(self):
         px_rec = V30PresExRecord()
 
         self.profile.context.injector.clear_binding(BaseResponder)
         await self.manager.send_pres_ack(px_rec)
 
-    async def test_receive_pres_ack(self):
+    async def test_receive_pres_ack_a(self):
         conn_record = async_mock.MagicMock(connection_id=CONN_ID)
 
         px_rec_dummy = V30PresExRecord()
@@ -2015,6 +2214,24 @@ class TestV30PresManager(AsyncTestCase):
             save_ex.assert_called_once()
 
             assert px_rec_out.state == V30PresExRecord.STATE_DONE
+
+    async def test_receive_pres_ack_b(self):
+        conn_record = async_mock.MagicMock(connection_id=CONN_ID)
+
+        px_rec_dummy = V30PresExRecord()
+        message = async_mock.MagicMock(_verification_result="true")
+
+        with async_mock.patch.object(
+            V30PresExRecord, "save", autospec=True
+        ) as save_ex, async_mock.patch.object(
+            V30PresExRecord, "retrieve_by_tag_filter", autospec=True
+        ) as retrieve_ex:
+            retrieve_ex.return_value = px_rec_dummy
+            px_rec_out = await self.manager.receive_pres_ack(message, conn_record)
+            save_ex.assert_called_once()
+
+            assert px_rec_out.state == V30PresExRecord.STATE_DONE
+            assert px_rec_out.verified == "true"
 
     async def test_receive_problem_report(self):
         connection_id = "connection-id"
@@ -2080,7 +2297,7 @@ class TestV30PresManager(AsyncTestCase):
             "retrieve_by_tag_filter",
             async_mock.CoroutineMock(),
         ) as retrieve_ex:
-            retrieve_ex.side_effect = test_module.StorageNotFoundError("No such record")
+            retrieve_ex.side_effect = StorageNotFoundError("No such record")
 
-            with self.assertRaises(test_module.StorageNotFoundError):
+            with self.assertRaises(StorageNotFoundError):
                 await self.manager.receive_problem_report(problem, connection_id)
