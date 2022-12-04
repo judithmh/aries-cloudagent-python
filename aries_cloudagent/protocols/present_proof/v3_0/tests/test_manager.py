@@ -519,10 +519,12 @@ class TestV30PresManager(AsyncTestCase):
     async def test_create_exchange_for_proposal(self):
         proposal = V30PresProposal(
             attachments=[
-                AttachDecorator.data_base64(INDY_PROOF_REQ_NAME, ident="indy",
-                format = V30PresFormat(
-                    format_=V30PresFormat.Format.INDY.aries,
-                )
+                AttachDecorator.data_base64(
+                    INDY_PROOF_REQ_NAME,
+                    ident="indy",
+                    format=V30PresFormat(
+                        format_=V30PresFormat.Format.INDY.aries,
+                    ),
                 )
             ],
         )
@@ -546,10 +548,12 @@ class TestV30PresManager(AsyncTestCase):
         connection_record = async_mock.MagicMock(connection_id=CONN_ID)
         proposal = V30PresProposal(
             attachments=[
-                AttachDecorator.data_base64(INDY_PROOF_REQ_NAME, ident="indy",
-                format = V30PresFormat(
-                    format_=V30PresFormat.Format.INDY.aries,
-                )
+                AttachDecorator.data_base64(
+                    INDY_PROOF_REQ_NAME,
+                    ident="indy",
+                    format=V30PresFormat(
+                        format_=V30PresFormat.Format.INDY.aries,
+                    ),
                 )
             ],
         )
@@ -573,8 +577,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -608,8 +612,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -671,8 +675,8 @@ class TestV30PresManager(AsyncTestCase):
                         ident="dif",
                         format=V30PresFormat(
                             format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                            V30PresFormat.Format.DIF.api
-                        ],
+                                V30PresFormat.Format.DIF.api
+                            ],
                         ),
                     )
                 ],
@@ -715,10 +719,10 @@ class TestV30PresManager(AsyncTestCase):
                     DIF_PRES_REQ,
                     ident="dif",
                     format=V30PresFormat(
-                    attach_id="dif",
+                        attach_id="dif",
                         format_=ATTACHMENT_FORMAT[PRES_30][
-                        V30PresFormat.Format.DIF.api
-                    ],
+                            V30PresFormat.Format.DIF.api
+                        ],
                     ),
                 )
             ],
@@ -741,8 +745,8 @@ class TestV30PresManager(AsyncTestCase):
     async def test_create_exchange_for_request(self):
         pres_req = V30PresRequest(
             body=V30PresBody(
-            comment="Test",
-            will_confirm=True,
+                comment="Test",
+                will_confirm=True,
             ),
             attachments=[
                 AttachDecorator.data_base64(
@@ -750,8 +754,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -785,8 +789,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -835,8 +839,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -892,8 +896,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -952,8 +956,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1038,8 +1042,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1112,8 +1116,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1211,8 +1215,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1252,8 +1256,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1289,8 +1293,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1303,8 +1307,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1365,8 +1369,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1383,8 +1387,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1471,8 +1475,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1553,8 +1557,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1619,8 +1623,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1633,8 +1637,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1648,7 +1652,7 @@ class TestV30PresManager(AsyncTestCase):
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30][
                             V30PresFormat.Format.INDY.api
-            ],
+                        ],
                     ),
                 )
             ],
@@ -1681,8 +1685,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1745,8 +1749,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1759,8 +1763,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1808,8 +1812,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1870,8 +1874,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1884,8 +1888,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -1899,7 +1903,7 @@ class TestV30PresManager(AsyncTestCase):
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30][
                             V30PresFormat.Format.INDY.api
-            ],
+                        ],
                     ),
                 )
             ],
@@ -1935,8 +1939,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -2000,8 +2004,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -2065,8 +2069,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_PROPOSAL][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -2094,7 +2098,7 @@ class TestV30PresManager(AsyncTestCase):
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30][
                             V30PresFormat.Format.INDY.api
-            ],
+                        ],
                     ),
                 )
             ],
@@ -2126,8 +2130,8 @@ class TestV30PresManager(AsyncTestCase):
                     ident="indy",
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30_REQUEST][
-                        V30PresFormat.Format.INDY.api
-                    ],
+                            V30PresFormat.Format.INDY.api
+                        ],
                     ),
                 )
             ],
@@ -2141,7 +2145,7 @@ class TestV30PresManager(AsyncTestCase):
                     format=V30PresFormat(
                         format_=ATTACHMENT_FORMAT[PRES_30][
                             V30PresFormat.Format.INDY.api
-            ],
+                        ],
                     ),
                 )
             ],
